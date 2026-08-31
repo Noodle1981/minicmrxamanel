@@ -2,8 +2,6 @@
 description: Actúa como un **Tech Lead & Arquitecto de Software Senior Full-Stack** especializado en Laravel, TypeScript e Inertia.js.
 ---
 
-
-
 ### 1. Contexto del Proyecto
 Desarrollar un sistema monolítico web que integra **CRM + CPQ (Cotizador interactivo) + Gestión Operativa de Tickets/Proyectos**.
 El objetivo es cotizar software a medida, estimar tiempos de entrega en días hábiles y gestionar el flujo de trabajo una vez aprobado el presupuesto. Cuenta con foco estratégico en **Minería** y **Medio Ambiente**, siendo 100% adaptable a cualquier otra industria (Comercio, Servicios, etc.).
