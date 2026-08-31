@@ -186,13 +186,6 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
 
                 {/* Switcher Multi-Rol (Si el usuario tiene varios roles) */}
                 <div className="p-4 border-b border-white/10 bg-white/[0.02]">
-                    <div className="text-[11px] font-semibold text-white/50 uppercase tracking-wider mb-2 flex items-center justify-between">
-                        <span>Rol Activo</span>
-                        {userRoles.length > 1 && (
-                            <span className="text-[#30EEE2] text-[10px] font-normal">Multi-Rol habilitado</span>
-                        )}
-                    </div>
-
                     {userRoles.length > 1 ? (
                         <div className="relative">
                             <button
@@ -299,29 +292,29 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
                     })}
                 </nav>
 
-                {/* Footer del Sidebar con Usuario y Logout */}
+                {/* Footer del Sidebar con Cerrar Sesión */}
                 <div className="p-4 border-t border-white/10 bg-white/[0.02]">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3 overflow-hidden">
-                            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#3C84CE] to-[#65005E] flex items-center justify-center text-white font-bold text-sm shrink-0 border border-white/20">
+                    <Link
+                        href={route('logout')}
+                        method="post"
+                        as="button"
+                        className="w-full flex items-center justify-between p-2 rounded-xl text-white/70 hover:text-rose-400 hover:bg-rose-500/10 transition-colors group"
+                        title="Cerrar Sesión"
+                    >
+                        <div className="flex items-center gap-3 overflow-hidden text-left">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#3C84CE] to-[#65005E] flex items-center justify-center text-white font-bold text-xs shrink-0 border border-white/20">
                                 {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
                             </div>
                             <div className="overflow-hidden">
-                                <p className="text-xs font-semibold text-white truncate">{user.name}</p>
-                                <p className="text-[11px] text-white/50 truncate">{user.email}</p>
+                                <p className="text-xs font-semibold text-white group-hover:text-rose-400 transition-colors">
+                                    Cerrar Sesión
+                                </p>
+                                <p className="text-[10px] text-white/40 truncate">{user.email}</p>
                             </div>
                         </div>
 
-                        <Link
-                            href={route('logout')}
-                            method="post"
-                            as="button"
-                            className="p-2 rounded-lg text-white/50 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
-                            title="Cerrar Sesión"
-                        >
-                            <LogOut className="w-4 h-4" />
-                        </Link>
-                    </div>
+                        <LogOut className="w-4 h-4 text-white/40 group-hover:text-rose-400 transition-colors shrink-0" />
+                    </Link>
                 </div>
             </aside>
 
@@ -368,10 +361,14 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
                             </button>
 
                             {profileDropdownOpen && (
-                                <div className="absolute right-0 mt-2 w-48 py-1 bg-[#161D2E] border border-white/10 rounded-xl shadow-2xl z-40 backdrop-blur-xl">
-                                    <div className="px-4 py-2 border-b border-white/10">
+                                <div className="absolute right-0 mt-2 w-52 py-1 bg-[#161D2E] border border-white/10 rounded-xl shadow-2xl z-40 backdrop-blur-xl">
+                                    <div className="px-4 py-2.5 border-b border-white/10">
                                         <p className="text-xs font-semibold text-white truncate">{user.name}</p>
-                                        <p className="text-[11px] text-white/50 truncate">{user.email}</p>
+                                        <p className="text-[11px] text-white/50 truncate mb-1.5">{user.email}</p>
+                                        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#30EEE2]/10 text-[#30EEE2] border border-[#30EEE2]/30">
+                                            <Shield className="w-2.5 h-2.5" />
+                                            {roleLabels[activeRole]?.label || activeRole}
+                                        </div>
                                     </div>
                                     <Link
                                         href={route('profile.edit')}
