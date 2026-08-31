@@ -305,18 +305,18 @@ export default function Index({ features, softwareTypes, categories, filters, me
             </div>
 
             {/* Tabla de Módulos y Matriz IA */}
-            <div className="glass-panel overflow-hidden">
+            <div className="glass-panel overflow-hidden mb-6">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs">
                         <thead className="bg-white/[0.03] text-white/60 uppercase text-[10px] tracking-wider border-b border-white/10">
                             <tr>
-                                <th className="p-4">Módulo / Feature</th>
-                                <th className="p-4">Categoría</th>
-                                <th className="p-4 text-center">Matriz de Horas (Dev / Int / QA)</th>
-                                <th className="p-4 text-center">Total hs</th>
-                                <th className="p-4 text-center">Infraestructura</th>
-                                <th className="p-4 text-center">Presets</th>
-                                <th className="p-4 text-right">Acción</th>
+                                <th className="p-4 min-w-[340px]">Módulo / Feature & Alcance Técnico</th>
+                                <th className="p-4 min-w-[140px]">Categoría</th>
+                                <th className="p-4 text-center whitespace-nowrap">Matriz de Horas (Dev / Int / QA)</th>
+                                <th className="p-4 text-center whitespace-nowrap">Total hs</th>
+                                <th className="p-4 text-center whitespace-nowrap">Infraestructura</th>
+                                <th className="p-4 text-center whitespace-nowrap">Presets</th>
+                                <th className="p-4 text-right whitespace-nowrap">Acción</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-white/5">
@@ -325,85 +325,85 @@ export default function Index({ features, softwareTypes, categories, filters, me
 
                                 return (
                                     <tr key={feat.id} className="hover:bg-white/[0.02] transition-colors">
-                                        <td className="p-4">
-                                            <div className="font-heading font-bold text-white text-sm">
+                                        <td className="p-4.5 align-top">
+                                            <div className="font-heading font-bold text-white text-sm leading-snug">
                                                 {feat.name}
                                             </div>
                                             {feat.description && (
-                                                <p className="text-[11px] text-white/50 line-clamp-1 mt-0.5">
+                                                <p className="text-xs text-white/70 mt-1.5 leading-relaxed">
                                                     {feat.description}
                                                 </p>
                                             )}
                                         </td>
 
-                                        <td className="p-4">
-                                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-white/70 border border-white/10 font-semibold">
+                                        <td className="p-4.5 align-top">
+                                            <span className="text-[10px] px-2.5 py-1 rounded-md bg-white/5 text-white/80 border border-white/10 font-semibold inline-block">
                                                 {feat.category}
                                             </span>
                                         </td>
 
-                                        <td className="p-4 text-center">
-                                            <div className="flex items-center justify-center gap-1.5 font-mono text-[11px]">
-                                                <span className="text-indigo-300 font-bold" title="Horas Dev">{feat.hours_dev}d</span>
+                                        <td className="p-4.5 text-center align-top whitespace-nowrap">
+                                            <div className="flex items-center justify-center gap-1.5 font-mono text-xs">
+                                                <span className="text-indigo-300 font-bold bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20" title="Horas Dev">{feat.hours_dev}d Dev</span>
                                                 <span className="text-white/30">+</span>
-                                                <span className="text-cyan-300 font-bold" title="Horas Integración">{feat.hours_integration}i</span>
+                                                <span className="text-cyan-300 font-bold bg-cyan-500/10 px-1.5 py-0.5 rounded border border-cyan-500/20" title="Horas Integración">{feat.hours_integration}i Int</span>
                                                 <span className="text-white/30">+</span>
-                                                <span className="text-amber-300 font-bold" title="Horas QA">{feat.hours_testing_qa}q</span>
+                                                <span className="text-amber-300 font-bold bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20" title="Horas QA">{feat.hours_testing_qa}q QA</span>
                                             </div>
                                         </td>
 
-                                        <td className="p-4 text-center">
-                                            <span className="font-heading font-extrabold text-[#30EEE2] text-sm">
+                                        <td className="p-4.5 text-center align-top whitespace-nowrap">
+                                            <span className="font-heading font-extrabold text-[#30EEE2] text-sm block">
                                                 {totalHours} hs
                                             </span>
                                         </td>
 
-                                        <td className="p-4 text-center font-mono text-[11px] text-white/70">
+                                        <td className="p-4.5 text-center align-top font-mono text-xs text-white/70 whitespace-nowrap">
                                             {feat.cost_setup_infra > 0 || feat.cost_monthly_infra > 0 ? (
                                                 <div>
-                                                    <div>${feat.cost_setup_infra} setup</div>
-                                                    <div className="text-[10px] text-white/40">${feat.cost_monthly_infra}/mes</div>
+                                                    <div className="text-white font-medium">${feat.cost_setup_infra} setup</div>
+                                                    <div className="text-[10px] text-purple-300">${feat.cost_monthly_infra}/mes</div>
                                                 </div>
                                             ) : (
                                                 <span className="text-white/30">—</span>
                                             )}
                                         </td>
 
-                                        <td className="p-4 text-center">
-                                            <div className="flex flex-wrap items-center justify-center gap-1 max-w-[150px] mx-auto">
+                                        <td className="p-4.5 text-center align-top">
+                                            <div className="flex flex-wrap items-center justify-center gap-1 max-w-[160px] mx-auto">
                                                 {feat.is_preset_mining && (
-                                                    <span className="text-[9px] px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30" title="Minería">
+                                                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-medium" title="Minería">
                                                         ⛏️ Min
                                                     </span>
                                                 )}
                                                 {feat.is_preset_environment && (
-                                                    <span className="text-[9px] px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" title="Medio Ambiente">
+                                                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-medium" title="Medio Ambiente">
                                                         🌱 Amb
                                                     </span>
                                                 )}
                                                 {feat.is_preset_commerce && (
-                                                    <span className="text-[9px] px-1 py-0.2 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30" title="Comercio">
+                                                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 font-medium" title="Comercio">
                                                         🛒 Com
                                                     </span>
                                                 )}
                                                 {feat.is_preset_industry && (
-                                                    <span className="text-[9px] px-1 py-0.2 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30" title="Industria">
+                                                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 font-medium" title="Industria">
                                                         🏭 Ind
                                                     </span>
                                                 )}
                                                 {feat.is_preset_services && (
-                                                    <span className="text-[9px] px-1 py-0.2 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30" title="Servicios">
+                                                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30 font-medium" title="Servicios">
                                                         💼 Srv
                                                     </span>
                                                 )}
                                             </div>
                                         </td>
 
-                                        <td className="p-4 text-right">
+                                        <td className="p-4.5 text-right align-top whitespace-nowrap">
                                             <button
                                                 type="button"
                                                 onClick={() => openEditModal(feat)}
-                                                className="btn-xamanen-secondary text-[11px] px-2.5 py-1.5"
+                                                className="btn-xamanen-secondary text-[11px] px-3 py-1.5 inline-flex items-center gap-1"
                                             >
                                                 <Edit className="w-3.5 h-3.5" />
                                                 Editar
@@ -415,6 +415,32 @@ export default function Index({ features, softwareTypes, categories, filters, me
                         </tbody>
                     </table>
                 </div>
+
+                {/* Paginación */}
+                {features.links && features.links.length > 3 && (
+                    <div className="p-4 border-t border-white/10 flex items-center justify-between">
+                        <span className="text-xs text-white/50">
+                            Mostrando página {features.current_page} de {features.last_page} ({features.total} módulos en total)
+                        </span>
+                        <div className="flex items-center gap-1">
+                            {features.links.map((link, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => link.url && router.get(link.url, {}, { preserveState: true })}
+                                    disabled={!link.url || link.active}
+                                    dangerouslySetInnerHTML={{ __html: link.label }}
+                                    className={`px-3 py-1 text-xs rounded-lg transition-all ${
+                                        link.active
+                                            ? 'bg-[#30EEE2] text-[#0A0C10] font-bold shadow-md shadow-[#30EEE2]/20'
+                                            : link.url
+                                            ? 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'
+                                            : 'bg-transparent text-white/20 cursor-not-allowed'
+                                    }`}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* ==================== MODAL DE CREACIÓN / EDICIÓN ==================== */}
