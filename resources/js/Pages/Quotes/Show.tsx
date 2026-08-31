@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
-import { Head, Link, router } from '@inertiajs/react';
-import { Quote, QuoteStatus } from '@/types';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Quote, QuoteStatus, User } from '@/types';
 import {
     FileText,
     ArrowLeft,
@@ -21,6 +21,8 @@ import {
     Phone,
     MapPin,
     AlertCircle,
+    Lock,
+    UserCheck,
 } from 'lucide-react';
 
 interface ShowProps {
@@ -28,6 +30,11 @@ interface ShowProps {
 }
 
 export default function Show({ quote }: ShowProps) {
+    const { auth } = usePage<{ auth: { user: User } }>().props;
+    const isCreator = auth?.user?.id === quote.created_by;
+    const isSuperAdmin = auth?.user?.roles?.some((r: any) => r.name === 'super_admin');
+    const canManageStatus = isCreator || isSuperAdmin;
+
     const [statusModalOpen, setStatusModalOpen] = useState(false);
     const [selectedStatus, setSelectedStatus] = useState<QuoteStatus>(quote.status);
     const [rejectionReason, setRejectionReason] = useState('');
@@ -89,7 +96,9 @@ export default function Show({ quote }: ShowProps) {
                                 {CurrentStatus.label}
                             </span>
                         </div>
-                        <p className="text-xs text-white/50">{quote.title}</p>
+                        <p className="text-xs text-white/50">
+                            {quote.title} • Vendedor: <strong className="text-white">{quote.creator?.name || 'Comercial'}</strong>
+                        </p>
                     </div>
                 </div>
             }
@@ -99,8 +108,15 @@ export default function Show({ quote }: ShowProps) {
             <div className="space-y-6 max-w-5xl mx-auto print:max-w-none print:text-black">
                 {/* Barra de Acciones del Documento (En el Cuerpo) */}
                 <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl glass-panel print:hidden">
-                    <div className="text-xs text-white/60">
-                        Acciones comerciales para el presupuesto <strong className="text-white">{quote.quote_number}</strong>
+                    <div className="flex items-center gap-2 text-xs text-white/60">
+                        <span>Vendedor Titular:</span>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/5 text-white border border-white/10 font-bold">
+                            <UserCheck className="w-3 h-3 text-[#30EEE2]" />
+                            {quote.creator?.name || 'Vendedor Asignado'}
+                        </span>
+                        {isCreator && (
+                            <span className="text-[10px] text-emerald-400 font-semibold">(Tú eres el titular)</span>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -113,29 +129,38 @@ export default function Show({ quote }: ShowProps) {
                             Imprimir / PDF
                         </button>
 
-                        {/* Botones de acción rápida según estado */}
-                        {quote.status === 'draft' && (
-                            <button
-                                type="button"
-                                onClick={() => handleStatusUpdate('sent')}
-                                disabled={updating}
-                                className="btn-xamanen-secondary text-xs px-3 py-2 text-[#30EEE2] border-[#30EEE2]/40"
-                            >
-                                <Send className="w-3.5 h-3.5" />
-                                Marcar como Enviado
-                            </button>
-                        )}
+                        {/* Control de Permisos: Solo el creador o Super Admin puede cambiar el estado */}
+                        {canManageStatus ? (
+                            <>
+                                {quote.status === 'draft' && (
+                                    <button
+                                        type="button"
+                                        onClick={() => handleStatusUpdate('sent')}
+                                        disabled={updating}
+                                        className="btn-xamanen-secondary text-xs px-3 py-2 text-[#30EEE2] border-[#30EEE2]/40"
+                                    >
+                                        <Send className="w-3.5 h-3.5" />
+                                        Marcar como Enviado
+                                    </button>
+                                )}
 
-                        {quote.status !== 'accepted' && (
-                            <button
-                                type="button"
-                                onClick={() => handleStatusUpdate('accepted')}
-                                disabled={updating}
-                                className="btn-xamanen-primary text-xs px-3.5 py-2"
-                            >
-                                <CheckCircle2 className="w-3.5 h-3.5" />
-                                Aprobar Presupuesto
-                            </button>
+                                {quote.status !== 'accepted' && (
+                                    <button
+                                        type="button"
+                                        onClick={() => handleStatusUpdate('accepted')}
+                                        disabled={updating}
+                                        className="btn-xamanen-primary text-xs px-3.5 py-2"
+                                    >
+                                        <CheckCircle2 className="w-3.5 h-3.5" />
+                                        Aprobar Presupuesto
+                                    </button>
+                                )}
+                            </>
+                        ) : (
+                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs">
+                                <Lock className="w-3.5 h-3.5 shrink-0" />
+                                <span>Solo lectura (Pertenece a {quote.creator?.name || 'otro colega'})</span>
+                            </div>
                         )}
                     </div>
                 </div>

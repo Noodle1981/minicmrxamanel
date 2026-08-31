@@ -7,6 +7,7 @@ use App\Models\Feature;
 use App\Models\Quote;
 use App\Models\QuoteItem;
 use App\Models\SoftwareType;
+use App\Models\User;
 use App\Services\QuoteCalculationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -24,7 +25,7 @@ class QuoteController extends Controller
     }
 
     /**
-     * Listado de Presupuestos / Cotizaciones
+     * Listado de Presupuestos / Cotizaciones (Visible para todos los vendedores)
      */
     public function index(Request $request): Response
     {
@@ -41,6 +42,11 @@ class QuoteController extends Controller
             $query->where('client_id', $request->client_id);
         }
 
+        // Filtro por vendedor / creador de la cotización
+        if ($request->filled('seller_id')) {
+            $query->where('created_by', $request->seller_id);
+        }
+
         // Búsqueda por número o título
         if ($request->filled('search')) {
             $search = $request->search;
@@ -49,11 +55,19 @@ class QuoteController extends Controller
                     ->orWhere('title', 'like', "%{$search}%")
                     ->orWhereHas('client', function ($clientQ) use ($search) {
                         $clientQ->where('company_name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('creator', function ($creatorQ) use ($search) {
+                        $creatorQ->where('name', 'like', "%{$search}%");
                     });
             });
         }
 
         $quotes = $query->paginate(10)->withQueryString();
+
+        // Vendedores registrados
+        $sellers = User::whereHas('roles', function ($q) {
+            $q->whereIn('name', ['vendedor', 'super_admin']);
+        })->select('id', 'name', 'email')->orderBy('name')->get();
 
         // Métricas rápidas para el dashboard de cotizaciones
         $metrics = [
@@ -61,13 +75,16 @@ class QuoteController extends Controller
             'total_accepted_amount' => (float) Quote::where('status', 'accepted')->sum('total_amount'),
             'pending_review' => Quote::whereIn('status', ['sent', 'under_review'])->count(),
             'drafts' => Quote::where('status', 'draft')->count(),
+            'my_quotes_count' => Quote::where('created_by', $request->user()->id)->count(),
         ];
 
         return Inertia::render('Quotes/Index', [
             'quotes' => $quotes,
-            'filters' => $request->only(['status', 'client_id', 'search']),
+            'sellers' => $sellers,
+            'filters' => $request->only(['status', 'client_id', 'seller_id', 'search']),
             'clients' => Client::select('id', 'company_name')->orderBy('company_name')->get(),
             'metrics' => $metrics,
+            'currentUserId' => $request->user()->id,
         ]);
     }
 
@@ -157,7 +174,7 @@ class QuoteController extends Controller
 
             $deliveryDate = $this->calculationService->calculateBusinessDeliveryDate($startDate, $requiredBusinessDays);
 
-            // 5. Crear la cotización
+            // 5. Crear la cotización asignando el vendedor creador
             $quote = Quote::create([
                 'quote_number' => $this->calculationService->generateQuoteNumber(),
                 'client_id' => $validated['client_id'],
@@ -250,10 +267,20 @@ class QuoteController extends Controller
     }
 
     /**
-     * Actualizar estado comercial de la cotización
+     * Actualizar estado comercial de la cotización con validación de titularidad
      */
     public function updateStatus(Request $request, Quote $quote, \App\Services\ProjectService $projectService)
     {
+        $user = $request->user();
+        $isCreator = (int) $user->id === (int) $quote->created_by;
+        $isSuperAdmin = $user->hasRole('super_admin');
+
+        // Solo el vendedor creador o un super_admin puede cambiar el estado
+        if (!$isCreator && !$isSuperAdmin) {
+            $creatorName = $quote->creator->name ?? 'otro vendedor';
+            return back()->with('error', "Acceso restringido: Este presupuesto pertenece al vendedor titular {$creatorName}. Solo él o un Super Administrador tienen autorización para modificar su estado.");
+        }
+
         $validated = $request->validate([
             'status' => 'required|in:draft,sent,under_review,accepted,rejected',
             'rejection_reason' => 'nullable|string',

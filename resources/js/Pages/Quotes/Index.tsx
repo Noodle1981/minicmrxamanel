@@ -1,22 +1,24 @@
 import React, { useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import { Client, Quote, QuoteStatus } from '@/types';
+import { Client, Quote, QuoteStatus, SoftwareType, User } from '@/types';
 import {
-    Calculator,
+    FileText,
     Plus,
     Search,
     Filter,
-    ArrowUpRight,
-    CheckCircle2,
     Clock,
+    CheckCircle2,
     XCircle,
-    FileText,
-    TrendingUp,
+    ArrowUpRight,
+    Calculator,
+    DollarSign,
     Building2,
     Calendar,
-    DollarSign,
-    SlidersHorizontal,
+    Briefcase,
+    Sparkles,
+    UserCheck,
+    Lock,
 } from 'lucide-react';
 
 interface PaginatedQuotes {
@@ -29,9 +31,11 @@ interface PaginatedQuotes {
 
 interface IndexProps {
     quotes: PaginatedQuotes;
+    sellers: { id: number; name: string; email: string }[];
     filters: {
         status?: string;
         client_id?: string;
+        seller_id?: string;
         search?: string;
     };
     clients: Client[];
@@ -40,19 +44,22 @@ interface IndexProps {
         total_accepted_amount: number;
         pending_review: number;
         drafts: number;
+        my_quotes_count: number;
     };
+    currentUserId: number;
 }
 
-export default function Index({ quotes, filters, clients, metrics }: IndexProps) {
+export default function Index({ quotes, sellers, filters, clients, metrics, currentUserId }: IndexProps) {
     const [search, setSearch] = useState(filters.search || '');
     const [statusFilter, setStatusFilter] = useState(filters.status || '');
     const [clientFilter, setClientFilter] = useState(filters.client_id || '');
+    const [sellerFilter, setSellerFilter] = useState(filters.seller_id || '');
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         router.get(
             route('quotes.index'),
-            { search, status: statusFilter, client_id: clientFilter },
+            { search, status: statusFilter, client_id: clientFilter, seller_id: sellerFilter },
             { preserveState: true }
         );
     };
@@ -61,7 +68,7 @@ export default function Index({ quotes, filters, clients, metrics }: IndexProps)
         setStatusFilter(newStatus);
         router.get(
             route('quotes.index'),
-            { search, status: newStatus, client_id: clientFilter },
+            { search, status: newStatus, client_id: clientFilter, seller_id: sellerFilter },
             { preserveState: true }
         );
     };
@@ -70,7 +77,16 @@ export default function Index({ quotes, filters, clients, metrics }: IndexProps)
         setClientFilter(newClientId);
         router.get(
             route('quotes.index'),
-            { search, status: statusFilter, client_id: newClientId },
+            { search, status: statusFilter, client_id: newClientId, seller_id: sellerFilter },
+            { preserveState: true }
+        );
+    };
+
+    const handleSellerChange = (newSellerId: string) => {
+        setSellerFilter(newSellerId);
+        router.get(
+            route('quotes.index'),
+            { search, status: statusFilter, client_id: clientFilter, seller_id: newSellerId },
             { preserveState: true }
         );
     };
@@ -116,7 +132,7 @@ export default function Index({ quotes, filters, clients, metrics }: IndexProps)
             <div className="flex items-center justify-between gap-4 mb-6">
                 <div>
                     <h3 className="text-sm font-heading font-bold text-white">Resumen Comercial</h3>
-                    <p className="text-xs text-white/50">Monitoreo de propuestas emitidas y estado de cierre</p>
+                    <p className="text-xs text-white/50">Monitoreo de propuestas emitidas por el equipo</p>
                 </div>
                 <Link
                     href={route('quotes.create')}
@@ -138,8 +154,12 @@ export default function Index({ quotes, filters, clients, metrics }: IndexProps)
                             <Calculator className="w-4 h-4" />
                         </div>
                     </div>
-                    <p className="text-2xl font-heading font-bold text-white">{metrics.total_quotes}</p>
-                    <span className="text-[11px] text-white/40">Emitidas en plataforma</span>
+                    <p className="text-2xl font-heading font-bold text-white">
+                        {metrics.total_quotes}
+                    </p>
+                    <span className="text-[11px] text-white/40">
+                        {metrics.my_quotes_count} generadas por ti
+                    </span>
                 </div>
 
                 <div className="glass-panel p-5">
@@ -148,13 +168,13 @@ export default function Index({ quotes, filters, clients, metrics }: IndexProps)
                             Monto Aprobado
                         </span>
                         <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
-                            <TrendingUp className="w-4 h-4" />
+                            <DollarSign className="w-4 h-4" />
                         </div>
                     </div>
-                    <p className="text-2xl font-heading font-bold text-emerald-400">
+                    <p className="text-2xl font-heading font-bold text-emerald-300">
                         ${metrics.total_accepted_amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </p>
-                    <span className="text-[11px] text-white/40">Contratos cerrados</span>
+                    <span className="text-[11px] text-white/40">Convertidos a obra</span>
                 </div>
 
                 <div className="glass-panel p-5">
@@ -166,8 +186,10 @@ export default function Index({ quotes, filters, clients, metrics }: IndexProps)
                             <Clock className="w-4 h-4" />
                         </div>
                     </div>
-                    <p className="text-2xl font-heading font-bold text-amber-400">{metrics.pending_review}</p>
-                    <span className="text-[11px] text-white/40">Pendientes de respuesta</span>
+                    <p className="text-2xl font-heading font-bold text-amber-300">
+                        {metrics.pending_review}
+                    </p>
+                    <span className="text-[11px] text-white/40">Pendientes de decisión</span>
                 </div>
 
                 <div className="glass-panel p-5">
@@ -175,45 +197,50 @@ export default function Index({ quotes, filters, clients, metrics }: IndexProps)
                         <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">
                             Borradores
                         </span>
-                        <div className="p-2 rounded-lg bg-white/5 text-white/60">
+                        <div className="p-2 rounded-lg bg-white/5 text-white/40">
                             <FileText className="w-4 h-4" />
                         </div>
                     </div>
-                    <p className="text-2xl font-heading font-bold text-white/80">{metrics.drafts}</p>
-                    <span className="text-[11px] text-white/40">En edición interna</span>
+                    <p className="text-2xl font-heading font-bold text-white">
+                        {metrics.drafts}
+                    </p>
+                    <span className="text-[11px] text-white/40">Aún no enviadas</span>
                 </div>
             </div>
 
-            {/* Barra de Filtros y Búsqueda */}
+            {/* Barra de Filtros */}
             <div className="glass-panel p-4 mb-6">
-                <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-12 gap-3">
-                    <div className="sm:col-span-5 relative">
+                <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
+                    {/* Buscador */}
+                    <div className="lg:col-span-4 relative">
                         <Search className="w-4 h-4 text-white/40 absolute left-3.5 top-3" />
                         <input
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Buscar por código, título o cliente..."
+                            placeholder="Buscar código, título, cliente o vendedor..."
                             className="w-full input-xamanen text-xs pl-9"
                         />
                     </div>
 
-                    <div className="sm:col-span-3">
+                    {/* Filtro de Estado */}
+                    <div className="lg:col-span-2">
                         <select
                             value={statusFilter}
                             onChange={(e) => handleStatusChange(e.target.value)}
                             className="w-full input-xamanen text-xs bg-[#101522]"
                         >
                             <option value="">Todos los Estados</option>
-                            <option value="draft">Borrador</option>
-                            <option value="sent">Enviado</option>
+                            <option value="draft">Borradores</option>
+                            <option value="sent">Enviadas</option>
                             <option value="under_review">En Negociación</option>
-                            <option value="accepted">Aceptado</option>
-                            <option value="rejected">Rechazado</option>
+                            <option value="accepted">Aprobadas</option>
+                            <option value="rejected">Rechazadas</option>
                         </select>
                     </div>
 
-                    <div className="sm:col-span-3">
+                    {/* Filtro de Cliente */}
+                    <div className="lg:col-span-3">
                         <select
                             value={clientFilter}
                             onChange={(e) => handleClientChange(e.target.value)}
@@ -228,7 +255,24 @@ export default function Index({ quotes, filters, clients, metrics }: IndexProps)
                         </select>
                     </div>
 
-                    <div className="sm:col-span-1">
+                    {/* Filtro de Vendedor */}
+                    <div className="lg:col-span-2">
+                        <select
+                            value={sellerFilter}
+                            onChange={(e) => handleSellerChange(e.target.value)}
+                            className="w-full input-xamanen text-xs bg-[#101522]"
+                        >
+                            <option value="">Todos los Vendedores</option>
+                            {sellers.map((s) => (
+                                <option key={s.id} value={s.id}>
+                                    {s.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Botón Filtrar */}
+                    <div className="lg:col-span-1">
                         <button
                             type="submit"
                             className="w-full btn-xamanen-secondary text-xs p-2.5 flex items-center justify-center"
@@ -249,6 +293,7 @@ export default function Index({ quotes, filters, clients, metrics }: IndexProps)
                                 <th className="py-3.5 px-4 font-semibold">Código</th>
                                 <th className="py-3.5 px-4 font-semibold">Cliente & Rubro</th>
                                 <th className="py-3.5 px-4 font-semibold">Título del Proyecto</th>
+                                <th className="py-3.5 px-4 font-semibold">Vendedor Titular</th>
                                 <th className="py-3.5 px-4 font-semibold">Esfuerzo & Plazo</th>
                                 <th className="py-3.5 px-4 font-semibold">Total (USD)</th>
                                 <th className="py-3.5 px-4 font-semibold">Estado</th>
@@ -262,6 +307,7 @@ export default function Index({ quotes, filters, clients, metrics }: IndexProps)
                                     const StatusIcon = StatusBadge.icon;
                                     const industryInfo =
                                         industryBadges[quote.client?.industry || 'otro'] || industryBadges.otro;
+                                    const isMyQuote = quote.created_by === currentUserId;
 
                                     return (
                                         <tr
@@ -302,6 +348,25 @@ export default function Index({ quotes, filters, clients, metrics }: IndexProps)
                                                 </p>
                                             </td>
 
+                                            {/* Vendedor Titular */}
+                                            <td className="py-3.5 px-4">
+                                                <div className="flex items-center gap-1.5">
+                                                    <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
+                                                        {quote.creator?.name ? quote.creator.name.charAt(0).toUpperCase() : 'V'}
+                                                    </div>
+                                                    <div className="overflow-hidden">
+                                                        <span className="text-white font-medium block truncate max-w-[130px]">
+                                                            {quote.creator?.name || 'Comercial'}
+                                                        </span>
+                                                        {isMyQuote && (
+                                                            <span className="text-[9px] text-emerald-400 font-bold block">
+                                                                (Tu registro)
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </td>
+
                                             <td className="py-3.5 px-4">
                                                 <div className="flex items-center gap-1 font-semibold text-white">
                                                     <Clock className="w-3 h-3 text-[#30EEE2]" />
@@ -318,7 +383,7 @@ export default function Index({ quotes, filters, clients, metrics }: IndexProps)
 
                                             <td className="py-3.5 px-4">
                                                 <span
-                                                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold border ${StatusBadge.class}`}
+                                                    className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold border ${StatusBadge.class}`}
                                                 >
                                                     <StatusIcon className="w-3 h-3" />
                                                     {StatusBadge.label}
@@ -328,10 +393,10 @@ export default function Index({ quotes, filters, clients, metrics }: IndexProps)
                                             <td className="py-3.5 px-4 text-right">
                                                 <Link
                                                     href={route('quotes.show', quote.id)}
-                                                    className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-white/5 hover:bg-[#30EEE2]/10 hover:text-[#30EEE2] text-white/80 border border-white/10 hover:border-[#30EEE2]/30 transition-all text-xs font-semibold"
+                                                    className="btn-xamanen-secondary text-[11px] px-2.5 py-1.5 inline-flex items-center gap-1"
                                                 >
-                                                    Ver Detalle
-                                                    <ArrowUpRight className="w-3.5 h-3.5" />
+                                                    {isMyQuote ? 'Gestionar' : 'Ver Detalle'}
+                                                    <ArrowUpRight className="w-3 h-3" />
                                                 </Link>
                                             </td>
                                         </tr>
@@ -339,40 +404,17 @@ export default function Index({ quotes, filters, clients, metrics }: IndexProps)
                                 })
                             ) : (
                                 <tr>
-                                    <td colSpan={7} className="py-12 text-center text-white/40">
-                                        <FileText className="w-8 h-8 mx-auto mb-2 text-white/20" />
-                                        No se encontraron cotizaciones con los filtros seleccionados.
+                                    <td
+                                        colSpan={8}
+                                        className="py-12 text-center text-white/40"
+                                    >
+                                        No se encontraron cotizaciones registradas con los filtros seleccionados.
                                     </td>
                                 </tr>
                             )}
                         </tbody>
                     </table>
                 </div>
-
-                {/* Paginación */}
-                {quotes.links.length > 3 && (
-                    <div className="p-4 border-t border-white/10 flex items-center justify-between text-xs">
-                        <span className="text-white/50">
-                            Mostrando {quotes.data.length} de {quotes.total} presupuestos
-                        </span>
-                        <div className="flex gap-1">
-                            {quotes.links.map((link, idx) => (
-                                <Link
-                                    key={idx}
-                                    href={link.url || '#'}
-                                    dangerouslySetInnerHTML={{ __html: link.label }}
-                                    className={`px-3 py-1 rounded-lg border text-xs ${
-                                        link.active
-                                            ? 'bg-[#30EEE2] text-[#0A0C10] font-bold border-[#30EEE2]'
-                                            : link.url
-                                            ? 'bg-white/5 text-white/70 border-white/10 hover:bg-white/10'
-                                            : 'text-white/20 border-transparent cursor-not-allowed'
-                                    }`}
-                                />
-                            ))}
-                        </div>
-                    </div>
-                )}
             </div>
         </AppLayout>
     );
