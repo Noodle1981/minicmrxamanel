@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import { Project, Ticket, TicketStatus, User } from '@/types';
 import {
     CheckSquare,
@@ -17,11 +17,17 @@ import {
     Layers,
     ChevronRight,
     Send,
-    Edit3,
+    Edit,
+    Trash2,
+    X,
+    Sparkles,
+    Tag,
+    FolderKanban,
+    AlertTriangle,
 } from 'lucide-react';
 
 interface KanbanColumns {
-    backlog: Ticket[];
+    backlog?: Ticket[];
     todo: Ticket[];
     in_progress: Ticket[];
     testing_qa: Ticket[];
@@ -52,17 +58,32 @@ export default function Index({ columns, projects, technicalUsers, filters, metr
     const [selectedUser, setSelectedUser] = useState(filters.user_id || '');
 
     // Modales de interacción
-    const [activeTicket, setActiveTicket] = useState<Ticket | null>(null);
+    const [createEditModalOpen, setCreateEditModalOpen] = useState(false);
+    const [editingTicket, setEditingTicket] = useState<Ticket | null>(null);
     const [assignModalOpen, setAssignModalOpen] = useState(false);
     const [logHoursModalOpen, setLogHoursModalOpen] = useState(false);
     const [commentModalOpen, setCommentModalOpen] = useState(false);
+    const [activeTicket, setActiveTicket] = useState<Ticket | null>(null);
 
-    // Estados de formularios modales
+    // Formulario de Creación / Edición de Ticket
+    const { data: ticketForm, setData: setTicketForm, post: postTicket, patch: patchTicket, processing: ticketProcessing, errors: ticketErrors, reset: resetTicketForm } = useForm({
+        project_id: projects[0]?.id ? String(projects[0].id) : '',
+        title: '',
+        description: '',
+        type: 'feature' as 'feature' | 'bug' | 'refactor' | 'design' | 'dev' | 'test' | 'integration' | 'infrastructure',
+        priority: 'medium' as 'low' | 'medium' | 'high' | 'urgent',
+        status: 'todo' as TicketStatus,
+        estimated_hours: 8,
+        logged_hours: 0,
+        user_id: '',
+        role_in_ticket: 'desarrollador' as 'desarrollador' | 'disenador' | 'qa_tester' | 'validador',
+    });
+
+    // Estados de modales secundarios
     const [assignUserId, setAssignUserId] = useState(technicalUsers[0]?.id ? String(technicalUsers[0].id) : '');
     const [assignRole, setAssignRole] = useState<'desarrollador' | 'disenador' | 'qa_tester' | 'validador'>('desarrollador');
     const [loggedHoursInput, setLoggedHoursInput] = useState(0);
     const [commentInput, setCommentInput] = useState('');
-    const [isInternalComment, setIsInternalComment] = useState(true);
 
     const handleFilterChange = (projId: string, uId: string) => {
         setSelectedProject(projId);
@@ -72,6 +93,65 @@ export default function Index({ columns, projects, technicalUsers, filters, metr
             { project_id: projId, user_id: uId },
             { preserveState: true }
         );
+    };
+
+    const openCreateModal = () => {
+        setEditingTicket(null);
+        resetTicketForm();
+        setTicketForm({
+            project_id: projects[0]?.id ? String(projects[0].id) : '',
+            title: '',
+            description: '',
+            type: 'feature',
+            priority: 'medium',
+            status: 'todo',
+            estimated_hours: 8,
+            logged_hours: 0,
+            user_id: technicalUsers[0]?.id ? String(technicalUsers[0].id) : '',
+            role_in_ticket: 'desarrollador',
+        });
+        setCreateEditModalOpen(true);
+    };
+
+    const openEditModal = (ticket: Ticket) => {
+        setEditingTicket(ticket);
+        setTicketForm({
+            project_id: String(ticket.project_id),
+            title: ticket.title,
+            description: ticket.description || '',
+            type: (ticket.type as any) || 'feature',
+            priority: ticket.priority,
+            status: ticket.status,
+            estimated_hours: Number(ticket.estimated_hours) || 0,
+            logged_hours: Number(ticket.logged_hours) || 0,
+            user_id: '',
+            role_in_ticket: 'desarrollador',
+        });
+        setCreateEditModalOpen(true);
+    };
+
+    const handleTicketSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (editingTicket) {
+            patchTicket(route('tickets.update', editingTicket.id), {
+                onSuccess: () => {
+                    setCreateEditModalOpen(false);
+                    setEditingTicket(null);
+                },
+            });
+        } else {
+            postTicket(route('tickets.store'), {
+                onSuccess: () => {
+                    setCreateEditModalOpen(false);
+                },
+            });
+        }
+    };
+
+    const handleDeleteTicket = (ticket: Ticket) => {
+        if (confirm(`¿Estás seguro de eliminar el ticket ${ticket.ticket_number}?`)) {
+            router.delete(route('tickets.destroy', ticket.id), { preserveState: true });
+        }
     };
 
     const handleStatusMove = (ticket: Ticket, newStatus: TicketStatus) => {
@@ -119,18 +199,18 @@ export default function Index({ columns, projects, technicalUsers, filters, metr
 
     const handleCommentSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!activeTicket) return;
+        if (!activeTicket || !commentInput.trim()) return;
 
         router.post(
             route('tickets.comments.store', activeTicket.id),
             {
                 content: commentInput,
-                is_internal: isInternalComment,
+                is_internal: true,
             },
             {
                 onSuccess: () => {
-                    setCommentModalOpen(false);
                     setCommentInput('');
+                    setCommentModalOpen(false);
                     setActiveTicket(null);
                 },
                 preserveState: true,
@@ -146,9 +226,27 @@ export default function Index({ columns, projects, technicalUsers, filters, metr
         { id: 'done', title: 'Completado', color: 'border-emerald-500/50', badgeColor: 'bg-emerald-500/20 text-emerald-300' },
     ];
 
+    const priorityBadges: Record<string, { label: string; class: string }> = {
+        low: { label: 'Baja', class: 'bg-white/5 text-white/50 border-white/10' },
+        medium: { label: 'Media', class: 'bg-blue-500/20 text-blue-300 border-blue-500/30' },
+        high: { label: 'Alta', class: 'bg-amber-500/20 text-amber-300 border-amber-500/30' },
+        urgent: { label: 'Urgente', class: 'bg-rose-500/20 text-rose-300 border-rose-500/30 font-bold' },
+    };
+
+    const typeBadges: Record<string, string> = {
+        feature: 'bg-[#30EEE2]/10 text-[#30EEE2] border-[#30EEE2]/30',
+        bug: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
+        dev: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
+        design: 'bg-pink-500/20 text-pink-300 border-pink-500/30',
+        test: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+        refactor: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+        integration: 'bg-teal-500/20 text-teal-300 border-teal-500/30',
+        infrastructure: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+    };
+
     const roleBadgeColor: Record<string, string> = {
         desarrollador: 'text-indigo-300 bg-indigo-500/20 border-indigo-500/40',
-        disenador: 'text-fuchsia-300 bg-fuchsia-500/20 border-fuchsia-500/40',
+        disenador: 'text-pink-300 bg-pink-500/20 border-pink-500/40',
         qa_tester: 'text-amber-300 bg-amber-500/20 border-amber-500/40',
         validador: 'text-teal-300 bg-teal-500/20 border-teal-500/40',
     };
@@ -173,18 +271,18 @@ export default function Index({ columns, projects, technicalUsers, filters, metr
         >
             <Head title="Tablero Kanban de Tickets" />
 
-            {/* Barra de Filtros del Tablero (En el Cuerpo) */}
+            {/* Barra de Acciones y Filtros del Tablero */}
             <div className="glass-panel p-4 mb-6 flex flex-wrap items-center justify-between gap-4">
                 <div>
-                    <h3 className="text-sm font-heading font-bold text-white">Filtros Operativos</h3>
-                    <p className="text-xs text-white/50">Filtra tarjetas por obra o especialista técnico</p>
+                    <h3 className="text-sm font-heading font-bold text-white">Filtros & Gestión de Tickets</h3>
+                    <p className="text-xs text-white/50">Crea tareas técnicas o filtra por proyecto y especialista</p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
                     <select
                         value={selectedProject}
                         onChange={(e) => handleFilterChange(e.target.value, selectedUser)}
-                        className="input-xamanen text-xs py-1.5 bg-[#101522]"
+                        className="input-xamanen text-xs py-2 bg-[#101522]"
                     >
                         <option value="">Todos los Proyectos</option>
                         {projects.map((p) => (
@@ -197,7 +295,7 @@ export default function Index({ columns, projects, technicalUsers, filters, metr
                     <select
                         value={selectedUser}
                         onChange={(e) => handleFilterChange(selectedProject, e.target.value)}
-                        className="input-xamanen text-xs py-1.5 bg-[#101522]"
+                        className="input-xamanen text-xs py-2 bg-[#101522]"
                     >
                         <option value="">Todos los Asignados</option>
                         {technicalUsers.map((u) => (
@@ -206,6 +304,15 @@ export default function Index({ columns, projects, technicalUsers, filters, metr
                             </option>
                         ))}
                     </select>
+
+                    <button
+                        type="button"
+                        onClick={openCreateModal}
+                        className="btn-xamanen-primary text-xs py-2 px-3.5 shadow-lg flex items-center gap-2"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Crear Nuevo Ticket
+                    </button>
                 </div>
             </div>
 
@@ -235,121 +342,141 @@ export default function Index({ columns, projects, technicalUsers, filters, metr
                             {/* Lista de Tarjetas con Scroll */}
                             <div className="space-y-3 overflow-y-auto pr-1 flex-1 custom-scrollbar">
                                 {ticketsInCol.length > 0 ? (
-                                    ticketsInCol.map((ticket) => (
-                                        <div
-                                            key={ticket.id}
-                                            className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 hover:border-[#30EEE2]/40 transition-all space-y-2.5 group"
-                                        >
-                                            {/* Header de la tarjeta */}
-                                            <div className="flex items-center justify-between text-[10px]">
-                                                <span className="font-mono font-bold text-[#30EEE2]">
-                                                    {ticket.ticket_number}
-                                                </span>
-                                                <span className="text-white/40 uppercase font-semibold">
-                                                    {ticket.type}
-                                                </span>
-                                            </div>
+                                    ticketsInCol.map((ticket) => {
+                                        const prio = priorityBadges[ticket.priority] || priorityBadges.medium;
+                                        const typeClass = typeBadges[ticket.type] || typeBadges.feature;
 
-                                            {/* Título y Proyecto */}
-                                            <div>
-                                                <h4 className="text-xs font-bold text-white leading-snug">
-                                                    {ticket.title}
-                                                </h4>
-                                                <span className="text-[10px] text-white/40 block mt-0.5 truncate">
-                                                    {ticket.project?.name}
-                                                </span>
-                                            </div>
-
-                                            {/* Asignaciones Multi-Rol */}
-                                            <div className="flex flex-wrap gap-1 pt-1">
-                                                {ticket.assignments && ticket.assignments.length > 0 ? (
-                                                    ticket.assignments.map((asgn) => (
-                                                        <span
-                                                            key={asgn.id}
-                                                            className={`text-[9px] px-1.5 py-0.5 rounded border font-medium flex items-center gap-1 ${
-                                                                roleBadgeColor[asgn.role_in_ticket] || 'bg-white/10 text-white'
-                                                            }`}
-                                                            title={`${asgn.user?.name} (${asgn.role_in_ticket})`}
-                                                        >
-                                                            <UserCircle className="w-2.5 h-2.5" />
-                                                            {asgn.user?.name?.split(' ')[0]} ({asgn.role_in_ticket.slice(0, 3)})
+                                        return (
+                                            <div
+                                                key={ticket.id}
+                                                className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 hover:border-[#30EEE2]/40 transition-all space-y-2.5 group"
+                                            >
+                                                {/* Header de la tarjeta */}
+                                                <div className="flex items-center justify-between text-[10px]">
+                                                    <span className="font-mono font-bold text-[#30EEE2]">
+                                                        {ticket.ticket_number}
+                                                    </span>
+                                                    <div className="flex items-center gap-1.5">
+                                                        <span className={`text-[9px] px-1.5 py-0.2 rounded border font-semibold ${prio.class}`}>
+                                                            {prio.label}
                                                         </span>
-                                                    ))
-                                                ) : (
-                                                    <span className="text-[9px] text-white/30 italic">
-                                                        Sin asignar
-                                                    </span>
-                                                )}
-                                            </div>
+                                                        <span className={`text-[9px] px-1.5 py-0.2 rounded border font-semibold uppercase ${typeClass}`}>
+                                                            {ticket.type}
+                                                        </span>
+                                                    </div>
+                                                </div>
 
-                                            {/* Horas & Acciones */}
-                                            <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[10px]">
-                                                <div className="flex items-center gap-1 text-white/60">
-                                                    <Clock className="w-3 h-3 text-[#30EEE2]" />
-                                                    <span>
-                                                        <strong className="text-white">{ticket.logged_hours}</strong> / {ticket.estimated_hours}h
+                                                {/* Título y Proyecto */}
+                                                <div>
+                                                    <h4 className="text-xs font-bold text-white leading-snug">
+                                                        {ticket.title}
+                                                    </h4>
+                                                    <span className="text-[10px] text-white/40 block mt-0.5 truncate">
+                                                        {ticket.project?.name || 'Proyecto'}
                                                     </span>
                                                 </div>
 
-                                                <div className="flex items-center gap-1">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => {
-                                                            setActiveTicket(ticket);
-                                                            setAssignModalOpen(true);
-                                                        }}
-                                                        className="p-1 rounded hover:bg-white/10 text-white/50 hover:text-white"
-                                                        title="Asignar Miembro Técnico"
-                                                    >
-                                                        <UserPlus className="w-3.5 h-3.5" />
-                                                    </button>
+                                                {/* Horas & Progreso */}
+                                                <div className="flex items-center justify-between text-[10px] text-white/60 bg-white/[0.02] p-1.5 rounded-lg border border-white/5">
+                                                    <span className="flex items-center gap-1">
+                                                        <Clock className="w-3 h-3 text-[#30EEE2]" />
+                                                        {Number(ticket.logged_hours || 0)}h / {Number(ticket.estimated_hours || 0)}h
+                                                    </span>
+                                                    <span className="font-mono text-white/40">
+                                                        {ticket.estimated_hours ? Math.round((Number(ticket.logged_hours) / Number(ticket.estimated_hours)) * 100) : 0}%
+                                                    </span>
+                                                </div>
 
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => {
-                                                            setActiveTicket(ticket);
-                                                            setLoggedHoursInput(ticket.logged_hours);
-                                                            setLogHoursModalOpen(true);
-                                                        }}
-                                                        className="p-1 rounded hover:bg-white/10 text-white/50 hover:text-[#30EEE2]"
-                                                        title="Cargar Horas"
-                                                    >
-                                                        <Edit3 className="w-3.5 h-3.5" />
-                                                    </button>
+                                                {/* Asignados */}
+                                                <div className="flex flex-wrap items-center gap-1">
+                                                    {ticket.assignments && ticket.assignments.length > 0 ? (
+                                                        ticket.assignments.map((asg) => (
+                                                            <span
+                                                                key={asg.id}
+                                                                className={`inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded border ${roleBadgeColor[asg.role_in_ticket] || 'text-white/60 bg-white/5 border-white/10'}`}
+                                                                title={`${asg.user?.name} (${asg.role_in_ticket})`}
+                                                            >
+                                                                <UserCircle className="w-2.5 h-2.5" />
+                                                                {asg.user?.name.split(' ')[0]}
+                                                            </span>
+                                                        ))
+                                                    ) : (
+                                                        <span className="text-[10px] text-white/30 italic">
+                                                            Sin asignar
+                                                        </span>
+                                                    )}
+                                                </div>
 
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => {
-                                                            setActiveTicket(ticket);
-                                                            setCommentModalOpen(true);
-                                                        }}
-                                                        className="p-1 rounded hover:bg-white/10 text-white/50 hover:text-white"
-                                                        title="Notas Técnicas"
+                                                {/* Barra de Acciones de Tarjeta */}
+                                                <div className="pt-2 border-t border-white/5 flex items-center justify-between gap-1">
+                                                    {/* Selector de Estado Rápido */}
+                                                    <select
+                                                        value={ticket.status}
+                                                        onChange={(e) => handleStatusMove(ticket, e.target.value as TicketStatus)}
+                                                        className="text-[10px] py-1 px-1.5 rounded-lg bg-[#101522] border border-white/10 text-white/80 focus:border-[#30EEE2]"
                                                     >
-                                                        <MessageSquare className="w-3.5 h-3.5" />
-                                                    </button>
+                                                        <option value="todo">Por Iniciar</option>
+                                                        <option value="in_progress">En Desarrollo</option>
+                                                        <option value="testing_qa">Testing QA</option>
+                                                        <option value="validated">Validado</option>
+                                                        <option value="done">Completado</option>
+                                                    </select>
+
+                                                    <div className="flex items-center gap-1">
+                                                        {/* Editar */}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => openEditModal(ticket)}
+                                                            className="p-1 rounded-md text-white/40 hover:text-white hover:bg-white/5 transition-colors"
+                                                            title="Editar Ticket"
+                                                        >
+                                                            <Edit className="w-3.5 h-3.5" />
+                                                        </button>
+
+                                                        {/* Asignar */}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setActiveTicket(ticket);
+                                                                setAssignModalOpen(true);
+                                                            }}
+                                                            className="p-1 rounded-md text-white/40 hover:text-[#30EEE2] hover:bg-white/5 transition-colors"
+                                                            title="Asignar Miembro"
+                                                        >
+                                                            <UserPlus className="w-3.5 h-3.5" />
+                                                        </button>
+
+                                                        {/* Cargar Horas */}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setActiveTicket(ticket);
+                                                                setLoggedHoursInput(Number(ticket.logged_hours) || 0);
+                                                                setLogHoursModalOpen(true);
+                                                            }}
+                                                            className="p-1 rounded-md text-white/40 hover:text-amber-300 hover:bg-white/5 transition-colors"
+                                                            title="Registrar Horas"
+                                                        >
+                                                            <Clock className="w-3.5 h-3.5" />
+                                                        </button>
+
+                                                        {/* Eliminar */}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleDeleteTicket(ticket)}
+                                                            className="p-1 rounded-md text-white/40 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                                                            title="Eliminar Ticket"
+                                                        >
+                                                            <Trash2 className="w-3.5 h-3.5" />
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
-
-                                            {/* Selector rápido de Mover Columna */}
-                                            <div className="pt-1">
-                                                <select
-                                                    value={ticket.status}
-                                                    onChange={(e) => handleStatusMove(ticket, e.target.value as TicketStatus)}
-                                                    className="w-full text-[10px] py-1 px-2 rounded-lg bg-[#161D2E] border border-white/10 text-white/80 focus:border-[#30EEE2] focus:outline-none"
-                                                >
-                                                    <option value="todo">Mover: Por Iniciar</option>
-                                                    <option value="in_progress">Mover: En Desarrollo</option>
-                                                    <option value="testing_qa">Mover: Testing & QA</option>
-                                                    <option value="validated">Mover: Validado</option>
-                                                    <option value="done">Mover: Completado</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    ))
+                                        );
+                                    })
                                 ) : (
-                                    <div className="py-8 text-center text-white/20 text-xs italic">
-                                        Sin tickets
+                                    <div className="py-8 text-center border border-dashed border-white/10 rounded-xl">
+                                        <p className="text-[11px] text-white/30">Sin tareas</p>
                                     </div>
                                 )}
                             </div>
@@ -358,41 +485,260 @@ export default function Index({ columns, projects, technicalUsers, filters, metr
                 })}
             </div>
 
-            {/* ==================== MODAL DE ASIGNACIÓN MULTI-ROL ==================== */}
-            {assignModalOpen && activeTicket && (
-                <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-                    <div className="glass-panel p-6 max-w-md w-full border-white/20 shadow-2xl space-y-4">
-                        <div className="flex items-center justify-between pb-2 border-b border-white/10">
-                            <div>
-                                <span className="text-[10px] font-mono font-bold text-[#30EEE2]">
-                                    {activeTicket.ticket_number}
-                                </span>
-                                <h3 className="text-sm font-heading font-bold text-white">
-                                    Asignar Miembro Técnico
-                                </h3>
-                            </div>
+            {/* ========================================================= */}
+            {/* MODAL 1: CREAR / EDITAR TICKET                           */}
+            {/* ========================================================= */}
+            {createEditModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+                    <div className="glass-panel p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto space-y-4">
+                        <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                            <h3 className="text-base font-heading font-bold text-white flex items-center gap-2">
+                                <CheckSquare className="w-5 h-5 text-[#30EEE2]" />
+                                {editingTicket ? `Editar Ticket ${editingTicket.ticket_number}` : 'Crear Nuevo Ticket'}
+                            </h3>
                             <button
-                                onClick={() => setAssignModalOpen(false)}
-                                className="text-white/40 hover:text-white text-xs"
+                                type="button"
+                                onClick={() => setCreateEditModalOpen(false)}
+                                className="p-1 rounded-lg text-white/60 hover:text-white hover:bg-white/5"
                             >
-                                ✕
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleTicketSubmit} className="space-y-4">
+                            {/* Proyecto Padre */}
+                            <div>
+                                <label className="block text-xs font-semibold text-white/70 uppercase tracking-wider mb-1">
+                                    Proyecto Asociado *
+                                </label>
+                                <select
+                                    value={ticketForm.project_id}
+                                    onChange={(e) => setTicketForm('project_id', e.target.value)}
+                                    className="w-full input-xamanen text-xs bg-[#101522]"
+                                    required
+                                    disabled={Boolean(editingTicket)}
+                                >
+                                    {projects.map((p) => (
+                                        <option key={p.id} value={p.id}>
+                                            {p.code} - {p.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                {ticketErrors.project_id && (
+                                    <p className="text-rose-400 text-xs mt-1">{ticketErrors.project_id}</p>
+                                )}
+                            </div>
+
+                            {/* Título */}
+                            <div>
+                                <label className="block text-xs font-semibold text-white/70 uppercase tracking-wider mb-1">
+                                    Título de la Tarea / Módulo *
+                                </label>
+                                <input
+                                    type="text"
+                                    value={ticketForm.title}
+                                    onChange={(e) => setTicketForm('title', e.target.value)}
+                                    placeholder="Ej. Implementar integración con API AFIP"
+                                    className="w-full input-xamanen text-xs"
+                                    required
+                                />
+                                {ticketErrors.title && (
+                                    <p className="text-rose-400 text-xs mt-1">{ticketErrors.title}</p>
+                                )}
+                            </div>
+
+                            {/* Descripción */}
+                            <div>
+                                <label className="block text-xs font-semibold text-white/70 uppercase tracking-wider mb-1">
+                                    Descripción / Criterios de Aceptación
+                                </label>
+                                <textarea
+                                    value={ticketForm.description}
+                                    onChange={(e) => setTicketForm('description', e.target.value)}
+                                    rows={3}
+                                    placeholder="Detalles técnicos, endpoints a consumir, diseño esperado..."
+                                    className="w-full input-xamanen text-xs"
+                                />
+                            </div>
+
+                            {/* Tipo, Prioridad y Estado */}
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div>
+                                    <label className="block text-xs font-semibold text-white/70 uppercase tracking-wider mb-1">
+                                        Tipo
+                                    </label>
+                                    <select
+                                        value={ticketForm.type}
+                                        onChange={(e) => setTicketForm('type', e.target.value as any)}
+                                        className="w-full input-xamanen text-xs bg-[#101522]"
+                                    >
+                                        <option value="feature">Feature</option>
+                                        <option value="bug">Bug / Error</option>
+                                        <option value="dev">Desarrollo</option>
+                                        <option value="design">Diseño UI/UX</option>
+                                        <option value="test">Testing QA</option>
+                                        <option value="integration">Integración</option>
+                                        <option value="infrastructure">Infraestructura</option>
+                                        <option value="refactor">Refactor</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-semibold text-white/70 uppercase tracking-wider mb-1">
+                                        Prioridad
+                                    </label>
+                                    <select
+                                        value={ticketForm.priority}
+                                        onChange={(e) => setTicketForm('priority', e.target.value as any)}
+                                        className="w-full input-xamanen text-xs bg-[#101522]"
+                                    >
+                                        <option value="low">Baja</option>
+                                        <option value="medium">Media</option>
+                                        <option value="high">Alta</option>
+                                        <option value="urgent">Urgente</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-semibold text-white/70 uppercase tracking-wider mb-1">
+                                        Estado Inicial
+                                    </label>
+                                    <select
+                                        value={ticketForm.status}
+                                        onChange={(e) => setTicketForm('status', e.target.value as any)}
+                                        className="w-full input-xamanen text-xs bg-[#101522]"
+                                    >
+                                        <option value="todo">Por Iniciar</option>
+                                        <option value="in_progress">En Desarrollo</option>
+                                        <option value="testing_qa">Testing QA</option>
+                                        <option value="validated">Validado</option>
+                                        <option value="done">Completado</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            {/* Horas Estimadas y Horas Registradas */}
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-xs font-semibold text-white/70 uppercase tracking-wider mb-1">
+                                        Horas Estimadas
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        step="0.5"
+                                        value={ticketForm.estimated_hours}
+                                        onChange={(e) => setTicketForm('estimated_hours', Number(e.target.value))}
+                                        className="w-full input-xamanen text-xs"
+                                    />
+                                </div>
+
+                                {editingTicket && (
+                                    <div>
+                                        <label className="block text-xs font-semibold text-white/70 uppercase tracking-wider mb-1">
+                                            Horas Reales Incurridas
+                                        </label>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            step="0.5"
+                                            value={ticketForm.logged_hours}
+                                            onChange={(e) => setTicketForm('logged_hours', Number(e.target.value))}
+                                            className="w-full input-xamanen text-xs"
+                                        />
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Asignación Inicial (Solo en Creación) */}
+                            {!editingTicket && (
+                                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-2">
+                                    <span className="text-xs font-bold text-white block">
+                                        Asignar Especialista Inicial (Opcional)
+                                    </span>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <select
+                                            value={ticketForm.user_id}
+                                            onChange={(e) => setTicketForm('user_id', e.target.value)}
+                                            className="w-full input-xamanen text-xs bg-[#101522]"
+                                        >
+                                            <option value="">Sin Asignar</option>
+                                            {technicalUsers.map((u) => (
+                                                <option key={u.id} value={u.id}>
+                                                    {u.name}
+                                                </option>
+                                            ))}
+                                        </select>
+
+                                        <select
+                                            value={ticketForm.role_in_ticket}
+                                            onChange={(e) => setTicketForm('role_in_ticket', e.target.value as any)}
+                                            className="w-full input-xamanen text-xs bg-[#101522]"
+                                        >
+                                            <option value="desarrollador">Desarrollador</option>
+                                            <option value="disenador">Diseñador UI/UX</option>
+                                            <option value="qa_tester">QA & Testing</option>
+                                            <option value="validador">Validador Tech Lead</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
+                                <button
+                                    type="button"
+                                    onClick={() => setCreateEditModalOpen(false)}
+                                    className="btn-xamanen-secondary text-xs"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={ticketProcessing}
+                                    className="btn-xamanen-primary text-xs shadow-lg"
+                                >
+                                    {editingTicket ? 'Guardar Cambios' : 'Crear Ticket'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* ========================================================= */}
+            {/* MODAL 2: ASIGNAR USUARIO CON ROL                          */}
+            {/* ========================================================= */}
+            {assignModalOpen && activeTicket && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+                    <div className="glass-panel p-6 max-w-md w-full space-y-4">
+                        <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                            <h3 className="text-base font-heading font-bold text-white flex items-center gap-2">
+                                <UserPlus className="w-5 h-5 text-[#30EEE2]" />
+                                Asignar a {activeTicket.ticket_number}
+                            </h3>
+                            <button
+                                type="button"
+                                onClick={() => setAssignModalOpen(false)}
+                                className="p-1 rounded-lg text-white/60 hover:text-white hover:bg-white/5"
+                            >
+                                <X className="w-5 h-5" />
                             </button>
                         </div>
 
                         <form onSubmit={handleAssignSubmit} className="space-y-4">
                             <div>
                                 <label className="block text-xs font-semibold text-white/70 uppercase tracking-wider mb-1.5">
-                                    Usuario Técnico
+                                    Miembro del Equipo *
                                 </label>
                                 <select
                                     value={assignUserId}
                                     onChange={(e) => setAssignUserId(e.target.value)}
-                                    className="w-full input-xamanen text-xs bg-[#101522]"
+                                    className="w-full input-xamanen text-sm bg-[#101522]"
                                     required
                                 >
                                     {technicalUsers.map((u) => (
                                         <option key={u.id} value={u.id}>
-                                            {u.name} ({u.email})
+                                            {u.name} ({u.roles?.map((r) => r.name).join(', ')})
                                         </option>
                                     ))}
                                 </select>
@@ -400,18 +746,18 @@ export default function Index({ columns, projects, technicalUsers, filters, metr
 
                             <div>
                                 <label className="block text-xs font-semibold text-white/70 uppercase tracking-wider mb-1.5">
-                                    Rol en este Ticket (Multi-Rol Flexible)
+                                    Rol Específico en este Ticket *
                                 </label>
                                 <select
                                     value={assignRole}
                                     onChange={(e) => setAssignRole(e.target.value as any)}
-                                    className="w-full input-xamanen text-xs bg-[#101522]"
+                                    className="w-full input-xamanen text-sm bg-[#101522]"
                                     required
                                 >
-                                    <option value="desarrollador">Desarrollador (Codificación / Feature)</option>
-                                    <option value="disenador">Diseñador (UI/UX / Assets)</option>
-                                    <option value="qa_tester">QA & Tester (Pruebas / Automatización)</option>
-                                    <option value="validador">Validador / Tech Lead (Aprobación Final)</option>
+                                    <option value="desarrollador">💻 Desarrollador (Codificación & Lógica)</option>
+                                    <option value="disenador">🎨 Diseñador UI/UX (Layout & Prototipos)</option>
+                                    <option value="qa_tester">🧪 QA Tester (Pruebas & Control de Calidad)</option>
+                                    <option value="validador">🛡️ Validador Tech Lead (Aprobación Final)</option>
                                 </select>
                             </div>
 
@@ -423,10 +769,7 @@ export default function Index({ columns, projects, technicalUsers, filters, metr
                                 >
                                     Cancelar
                                 </button>
-                                <button
-                                    type="submit"
-                                    className="btn-xamanen-primary text-xs"
-                                >
+                                <button type="submit" className="btn-xamanen-primary text-xs shadow-lg">
                                     Guardar Asignación
                                 </button>
                             </div>
@@ -435,34 +778,46 @@ export default function Index({ columns, projects, technicalUsers, filters, metr
                 </div>
             )}
 
-            {/* ==================== MODAL DE CARGA DE HORAS ==================== */}
+            {/* ========================================================= */}
+            {/* MODAL 3: REGISTRAR HORAS LABORADAS                       */}
+            {/* ========================================================= */}
             {logHoursModalOpen && activeTicket && (
-                <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-                    <div className="glass-panel p-6 max-w-sm w-full border-white/20 shadow-2xl space-y-4">
-                        <h3 className="text-sm font-heading font-bold text-white">
-                            Registrar Horas en {activeTicket.ticket_number}
-                        </h3>
-                        <p className="text-xs text-white/60">
-                            Horas estimadas: <strong className="text-white">{activeTicket.estimated_hours} hs</strong>
-                        </p>
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+                    <div className="glass-panel p-6 max-w-md w-full space-y-4">
+                        <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                            <h3 className="text-base font-heading font-bold text-white flex items-center gap-2">
+                                <Clock className="w-5 h-5 text-amber-300" />
+                                Carga de Horas — {activeTicket.ticket_number}
+                            </h3>
+                            <button
+                                type="button"
+                                onClick={() => setLogHoursModalOpen(false)}
+                                className="p-1 rounded-lg text-white/60 hover:text-white hover:bg-white/5"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
 
                         <form onSubmit={handleLogHoursSubmit} className="space-y-4">
                             <div>
                                 <label className="block text-xs font-semibold text-white/70 uppercase tracking-wider mb-1.5">
-                                    Horas Reales Invertidas (hs)
+                                    Total de Horas Reales Incurridas *
                                 </label>
                                 <input
                                     type="number"
-                                    step="0.5"
+                                    step="0.25"
                                     min="0"
                                     value={loggedHoursInput}
                                     onChange={(e) => setLoggedHoursInput(Number(e.target.value))}
                                     className="w-full input-xamanen text-sm"
                                     required
                                 />
+                                <span className="text-[11px] text-white/40 block mt-1">
+                                    Estimado presupuestado: {activeTicket.estimated_hours}h
+                                </span>
                             </div>
 
-                            <div className="flex items-center justify-end gap-3 pt-2">
+                            <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
                                 <button
                                     type="button"
                                     onClick={() => setLogHoursModalOpen(false)}
@@ -470,63 +825,8 @@ export default function Index({ columns, projects, technicalUsers, filters, metr
                                 >
                                     Cancelar
                                 </button>
-                                <button
-                                    type="submit"
-                                    className="btn-xamanen-primary text-xs"
-                                >
-                                    Guardar Horas
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-
-            {/* ==================== MODAL DE COMENTARIOS / NOTAS ==================== */}
-            {commentModalOpen && activeTicket && (
-                <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-                    <div className="glass-panel p-6 max-w-md w-full border-white/20 shadow-2xl space-y-4">
-                        <h3 className="text-sm font-heading font-bold text-white">
-                            Bitácora & Notas Técnicas: {activeTicket.ticket_number}
-                        </h3>
-
-                        {activeTicket.comments && activeTicket.comments.length > 0 && (
-                            <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
-                                {activeTicket.comments.map((c) => (
-                                    <div key={c.id} className="p-2.5 rounded-lg bg-white/[0.02] border border-white/5 text-xs">
-                                        <div className="flex items-center justify-between text-[10px] text-white/40 mb-1">
-                                            <strong>{c.user?.name}</strong>
-                                            <span>{new Date(c.created_at).toLocaleString('es-AR')}</span>
-                                        </div>
-                                        <p className="text-white/80">{c.content}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-
-                        <form onSubmit={handleCommentSubmit} className="space-y-3 pt-2 border-t border-white/10">
-                            <textarea
-                                rows={3}
-                                value={commentInput}
-                                onChange={(e) => setCommentInput(e.target.value)}
-                                placeholder="Escribe un avance técnico o nota de validación..."
-                                className="w-full input-xamanen text-xs"
-                                required
-                            />
-
-                            <div className="flex items-center justify-end gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() => setCommentModalOpen(false)}
-                                    className="btn-xamanen-secondary text-xs"
-                                >
-                                    Cerrar
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="btn-xamanen-primary text-xs"
-                                >
-                                    Agregar Nota
+                                <button type="submit" className="btn-xamanen-primary text-xs shadow-lg">
+                                    Actualizar Horas
                                 </button>
                             </div>
                         </form>

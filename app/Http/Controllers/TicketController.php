@@ -84,6 +84,54 @@ class TicketController extends Controller
     }
 
     /**
+     * Crear un nuevo Ticket / Tarea técnica manualmente
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'project_id' => 'required|exists:projects,id',
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'type' => 'required|in:feature,bug,refactor,design,dev,test,integration,infrastructure',
+            'priority' => 'required|in:low,medium,high,urgent',
+            'status' => 'required|in:backlog,todo,in_progress,testing_qa,validated,done',
+            'estimated_hours' => 'nullable|numeric|min:0',
+            'user_id' => 'nullable|exists:users,id',
+            'role_in_ticket' => 'nullable|in:desarrollador,disenador,qa_tester,validador',
+        ]);
+
+        $project = Project::findOrFail($validated['project_id']);
+        $count = $project->tickets()->count() + 1;
+        $ticketNumber = sprintf('%s-T%02d', $project->code, $count);
+
+        $ticket = Ticket::create([
+            'project_id' => $project->id,
+            'ticket_number' => $ticketNumber,
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? '',
+            'type' => $validated['type'],
+            'priority' => $validated['priority'],
+            'status' => $validated['status'],
+            'estimated_hours' => $validated['estimated_hours'] ?? 0,
+            'logged_hours' => 0,
+            'sort_order' => $count,
+        ]);
+
+        if (!empty($validated['user_id']) && !empty($validated['role_in_ticket'])) {
+            TicketAssignment::create([
+                'ticket_id' => $ticket->id,
+                'user_id' => $validated['user_id'],
+                'role_in_ticket' => $validated['role_in_ticket'],
+                'assigned_at' => now(),
+            ]);
+        }
+
+        $this->projectService->recalculateProgress($project);
+
+        return back()->with('success', "Ticket {$ticket->ticket_number} creado con éxito.");
+    }
+
+    /**
      * Actualizar estado o datos de un ticket
      */
     public function update(Request $request, Ticket $ticket)
@@ -91,6 +139,7 @@ class TicketController extends Controller
         $validated = $request->validate([
             'status' => 'nullable|in:backlog,todo,in_progress,testing_qa,validated,done',
             'priority' => 'nullable|in:low,medium,high,urgent',
+            'type' => 'nullable|in:feature,bug,refactor,design,dev,test,integration,infrastructure',
             'logged_hours' => 'nullable|numeric|min:0',
             'estimated_hours' => 'nullable|numeric|min:0',
             'title' => 'nullable|string|max:255',
@@ -100,9 +149,27 @@ class TicketController extends Controller
         $ticket->update(array_filter($validated, fn($v) => !is_null($v)));
 
         // Recalcular avance del proyecto padre
-        $this->projectService->recalculateProgress($ticket->project);
+        if ($ticket->project) {
+            $this->projectService->recalculateProgress($ticket->project);
+        }
 
         return back()->with('success', 'Ticket ' . $ticket->ticket_number . ' actualizado.');
+    }
+
+    /**
+     * Eliminar un ticket
+     */
+    public function destroy(Ticket $ticket)
+    {
+        $project = $ticket->project;
+        $number = $ticket->ticket_number;
+        $ticket->delete();
+
+        if ($project) {
+            $this->projectService->recalculateProgress($project);
+        }
+
+        return back()->with('success', "Ticket {$number} eliminado.");
     }
 
     /**
