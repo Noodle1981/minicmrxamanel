@@ -72,27 +72,27 @@ export default function Create({
             let autoTitle = prev.title;
 
             if (presetName === 'mineria') {
-                matchingFeatures = features.filter((f) => f.is_preset_mining);
+                matchingFeatures = features.filter((f) => Boolean(f.is_preset_mining) || (f as any).is_preset_mining == 1);
                 const miningType = softwareTypes.find((st) => st.slug.includes('mineria') || st.slug.includes('iot'));
                 if (miningType) recommendedTypeId = String(miningType.id);
                 autoTitle = 'Plataforma IoT & Gestión de Faena Minera';
             } else if (presetName === 'medio_ambiente') {
-                matchingFeatures = features.filter((f) => f.is_preset_environment);
+                matchingFeatures = features.filter((f) => Boolean(f.is_preset_environment) || (f as any).is_preset_environment == 1);
                 const saasType = softwareTypes.find((st) => st.slug.includes('saas') || st.slug.includes('gestion'));
                 if (saasType) recommendedTypeId = String(saasType.id);
                 autoTitle = 'Sistema de Gestión y Mediciones Ambientales';
             } else if (presetName === 'comercio') {
-                matchingFeatures = features.filter((f) => f.is_preset_commerce);
+                matchingFeatures = features.filter((f) => Boolean(f.is_preset_commerce) || (f as any).is_preset_commerce == 1);
                 const commType = softwareTypes.find((st) => st.slug.includes('ecommerce'));
                 if (commType) recommendedTypeId = String(commType.id);
                 autoTitle = 'Portal E-Commerce B2B con Facturación AFIP';
             } else if (presetName === 'industria') {
-                matchingFeatures = features.filter((f) => f.is_preset_industry);
+                matchingFeatures = features.filter((f) => Boolean(f.is_preset_industry) || (f as any).is_preset_industry == 1);
                 const indType = softwareTypes.find((st) => st.slug.includes('erp') || st.slug.includes('gestion'));
                 if (indType) recommendedTypeId = String(indType.id);
                 autoTitle = 'Sistema de Control de Producción y Mantenimiento Industrial';
             } else if (presetName === 'servicios') {
-                matchingFeatures = features.filter((f) => f.is_preset_services);
+                matchingFeatures = features.filter((f) => Boolean(f.is_preset_services) || (f as any).is_preset_services == 1);
                 const srvType = softwareTypes.find((st) => st.slug.includes('saas') || st.slug.includes('corporate') || st.slug.includes('landing'));
                 if (srvType) recommendedTypeId = String(srvType.id);
                 autoTitle = 'Portal de Gestión de Servicios, Clientes y Facturación';
@@ -105,7 +105,7 @@ export default function Create({
                 preset_used: presetName,
                 software_type_id: recommendedTypeId,
                 title: prev.title ? prev.title : autoTitle,
-                selected_feature_ids: matchingFeatures.map((f) => f.id),
+                selected_feature_ids: matchingFeatures.map((f) => Number(f.id)),
             };
         });
     };
@@ -113,10 +113,10 @@ export default function Create({
     // Toggle de selección de módulo individual
     const toggleFeature = (featureId: number) => {
         setData((prev) => {
-            const exists = prev.selected_feature_ids.includes(featureId);
+            const exists = prev.selected_feature_ids.some((id) => Number(id) === Number(featureId));
             const updated = exists
-                ? prev.selected_feature_ids.filter((id) => id !== featureId)
-                : [...prev.selected_feature_ids, featureId];
+                ? prev.selected_feature_ids.filter((id) => Number(id) !== Number(featureId))
+                : [...prev.selected_feature_ids, Number(featureId)];
 
             return {
                 ...prev,
@@ -137,7 +137,9 @@ export default function Create({
 
     // ==================== CÁLCULO CPQ EN TIEMPO REAL ====================
     const calculation = useMemo(() => {
-        const selectedFeaturesList = features.filter((f) => data.selected_feature_ids.includes(f.id));
+        const selectedFeaturesList = features.filter((f) =>
+            data.selected_feature_ids.some((id) => Number(id) === Number(f.id))
+        );
 
         const baseDev = Number(currentSoftwareType?.base_hours_dev || 0);
         const baseQa = Number(currentSoftwareType?.base_hours_qa || 0);
@@ -446,7 +448,9 @@ export default function Create({
 
                                     <div className="grid grid-cols-1 gap-2.5">
                                         {items.map((feature) => {
-                                            const isSelected = data.selected_feature_ids.includes(feature.id);
+                                            const isSelected = data.selected_feature_ids.some(
+                                                (id) => Number(id) === Number(feature.id)
+                                            );
                                             const totalFeatHours =
                                                 Number(feature.hours_dev) +
                                                 Number(feature.hours_integration) +
