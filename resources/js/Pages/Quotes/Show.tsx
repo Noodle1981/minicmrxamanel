@@ -105,9 +105,12 @@ export default function Show({ quote }: ShowProps) {
         >
             <Head title={`Presupuesto ${quote.quote_number}`} />
 
-            <div className="space-y-6 max-w-5xl mx-auto print:max-w-none print:text-black">
-                {/* Barra de Acciones del Documento (En el Cuerpo) */}
-                <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl glass-panel print:hidden">
+            {/* ========================================================= */}
+            {/* VISTA EN PANTALLA (WEB INTERACTIVA)                       */}
+            {/* ========================================================= */}
+            <div className="print:hidden space-y-6 max-w-5xl mx-auto">
+                {/* Barra de Acciones del Documento */}
+                <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl glass-panel">
                     <div className="flex items-center gap-2 text-xs text-white/60">
                         <span>Vendedor Titular:</span>
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/5 text-white border border-white/10 font-bold">
@@ -123,10 +126,10 @@ export default function Show({ quote }: ShowProps) {
                         <button
                             type="button"
                             onClick={handlePrint}
-                            className="btn-xamanen-secondary text-xs px-3 py-2"
+                            className="btn-xamanen-primary text-xs px-3.5 py-2 shadow-lg"
                         >
                             <Printer className="w-3.5 h-3.5" />
-                            Imprimir / PDF
+                            Imprimir / Guardar PDF (A4)
                         </button>
 
                         {/* Control de Permisos: Solo el creador o Super Admin puede cambiar el estado */}
@@ -149,7 +152,7 @@ export default function Show({ quote }: ShowProps) {
                                         type="button"
                                         onClick={() => handleStatusUpdate('accepted')}
                                         disabled={updating}
-                                        className="btn-xamanen-primary text-xs px-3.5 py-2"
+                                        className="btn-xamanen-secondary text-xs px-3.5 py-2 text-emerald-300 border-emerald-500/40"
                                     >
                                         <CheckCircle2 className="w-3.5 h-3.5" />
                                         Aprobar Presupuesto
@@ -164,16 +167,15 @@ export default function Show({ quote }: ShowProps) {
                         )}
                     </div>
                 </div>
-                {/* ==================== CABECERA EJECUTIVA / BRANDING ==================== */}
-                <div className="glass-panel p-8 border-white/10 relative overflow-hidden print:border-none print:shadow-none print:p-0">
-                    <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-[#30EEE2]/10 via-[#3C84CE]/5 to-transparent rounded-full blur-3xl pointer-events-none print:hidden"></div>
 
-                    <div className="flex flex-col sm:flex-row justify-between gap-6 pb-6 border-b border-white/10 print:border-gray-200">
+                {/* Cabecera Ejecutiva / Branding */}
+                <div className="glass-panel p-8 border-white/10 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-[#30EEE2]/10 via-[#3C84CE]/5 to-transparent rounded-full blur-3xl pointer-events-none"></div>
+
+                    <div className="flex flex-col sm:flex-row justify-between gap-6 pb-6 border-b border-white/10">
                         <div>
                             <div className="flex items-center gap-3 mb-2">
-                                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#30EEE2] via-[#3C84CE] to-[#65005E] flex items-center justify-center text-[#0A0C10] font-extrabold shadow-lg">
-                                    <Sparkles className="w-5 h-5 text-white" />
-                                </div>
+                                <img src="/images/logo.png" alt="Logo Xamanen" className="h-9 w-auto object-contain" />
                                 <div>
                                     <h3 className="text-xl font-heading font-extrabold text-white tracking-wide">
                                         GRUPO XAMANEN
@@ -220,11 +222,11 @@ export default function Show({ quote }: ShowProps) {
                             <div className="space-y-1 text-xs text-white/70">
                                 <p className="flex items-center gap-2">
                                     <Briefcase className="w-3.5 h-3.5 text-white/40" />
-                                    <strong>Contacto:</strong> {quote.client?.contact_name}
+                                    <strong>Contacto:</strong> {quote.client?.contact_name || '—'}
                                 </p>
                                 <p className="flex items-center gap-2">
                                     <Mail className="w-3.5 h-3.5 text-white/40" />
-                                    <strong>Email:</strong> {quote.client?.email}
+                                    <strong>Email:</strong> {quote.client?.email || '—'}
                                 </p>
                                 {quote.client?.phone && (
                                     <p className="flex items-center gap-2">
@@ -271,7 +273,7 @@ export default function Show({ quote }: ShowProps) {
                     </div>
                 </div>
 
-                {/* ==================== TABLA DETALLADA DE PARTIDAS Y MÓDULOS ==================== */}
+                {/* Tabla Detallada de Partidas y Módulos */}
                 <div className="glass-panel overflow-hidden border-white/10">
                     <div className="p-6 border-b border-white/10">
                         <h3 className="text-base font-heading font-bold text-white">
@@ -323,7 +325,7 @@ export default function Show({ quote }: ShowProps) {
                     </div>
                 </div>
 
-                {/* ==================== RESUMEN FINANCIERO Y TOTALES ==================== */}
+                {/* Resumen Financiero y Totales */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     {/* Términos y Condiciones */}
                     <div className="lg:col-span-7 glass-panel p-6 space-y-4">
@@ -393,6 +395,195 @@ export default function Show({ quote }: ShowProps) {
                             </span>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            {/* ========================================================= */}
+            {/* VISTA OFICIAL DE IMPRESIÓN / EXPORTACIÓN A PDF (A4 100%)  */}
+            {/* ========================================================= */}
+            <div className="hidden print:block w-full text-slate-900 bg-white font-sans text-xs">
+                {/* 1. Encabezado Corporativo Oficial */}
+                <div className="flex justify-between items-start pb-4 border-b-2 border-slate-900 mb-5">
+                    <div className="flex items-center gap-3.5">
+                        <img src="/images/logo.png" alt="Grupo Xamanen" className="h-12 w-auto object-contain" />
+                        <div>
+                            <h1 className="text-xl font-bold text-slate-900 tracking-tight">GRUPO XAMANEN</h1>
+                            <p className="text-[10px] uppercase font-bold text-slate-600 tracking-wider">
+                                Soluciones Tecnológicas & Software de Ingeniería
+                            </p>
+                            <p className="text-[9px] text-slate-500">
+                                CUIT: 30-71829340-9 • contacto@xamanen.com • www.grupoxamanen.com
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="text-right border-l-2 border-slate-200 pl-4">
+                        <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest block">
+                            Presupuesto Oficial
+                        </span>
+                        <div className="text-lg font-bold font-mono text-slate-900">
+                            {quote.quote_number}
+                        </div>
+                        <div className="text-[10px] text-slate-700 mt-1">
+                            <strong>Emisión:</strong> {new Date(quote.created_at).toLocaleDateString('es-AR')}
+                        </div>
+                        {quote.valid_until && (
+                            <div className="text-[10px] text-slate-700">
+                                <strong>Válido Hasta:</strong> {new Date(quote.valid_until).toLocaleDateString('es-AR')}
+                            </div>
+                        )}
+                        <div className="text-[10px] text-slate-600">
+                            <strong>Comercial:</strong> {quote.creator?.name || 'Comercial'}
+                        </div>
+                    </div>
+                </div>
+
+                {/* 2. Bloque de Cliente y Resumen del Proyecto */}
+                <div className="grid grid-cols-2 gap-4 mb-5">
+                    <div className="p-3.5 rounded-lg border border-slate-300 bg-slate-50">
+                        <span className="text-[9px] font-bold uppercase tracking-wider text-slate-600 block mb-1">
+                            Datos del Cliente
+                        </span>
+                        <h2 className="text-sm font-bold text-slate-900 mb-1">{quote.client?.company_name}</h2>
+                        <div className="text-[10px] space-y-0.5 text-slate-700">
+                            <p><strong>Contacto:</strong> {quote.client?.contact_name || '—'}</p>
+                            <p><strong>Email:</strong> {quote.client?.email || '—'}</p>
+                            {quote.client?.phone && <p><strong>Teléfono:</strong> {quote.client.phone}</p>}
+                            {quote.client?.cuit_tax_id && <p><strong>CUIT / Razón Social:</strong> {quote.client.cuit_tax_id}</p>}
+                            {quote.client?.address && <p><strong>Dirección:</strong> {quote.client.address}</p>}
+                        </div>
+                    </div>
+
+                    <div className="p-3.5 rounded-lg border border-slate-300 bg-slate-50">
+                        <span className="text-[9px] font-bold uppercase tracking-wider text-slate-600 block mb-1">
+                            Especificaciones de la Solución
+                        </span>
+                        <h2 className="text-sm font-bold text-slate-900 mb-1">{quote.title}</h2>
+                        <div className="text-[10px] space-y-0.5 text-slate-700">
+                            <p><strong>Tipo de Software:</strong> {quote.software_type?.name || 'A Medida'}</p>
+                            <p><strong>Plazo de Entrega:</strong> <strong className="text-slate-900">{quote.estimated_business_days} días hábiles</strong></p>
+                            <p><strong>Fecha Estimada Inicio:</strong> {quote.estimated_start_date ? new Date(quote.estimated_start_date).toLocaleDateString('es-AR') : 'A convenir'}</p>
+                            <p><strong>Fecha Estimada Entrega:</strong> {quote.estimated_delivery_date ? new Date(quote.estimated_delivery_date).toLocaleDateString('es-AR') : 'A convenir'}</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* 3. Tabla Desglosada de Partidas y Módulos */}
+                <div className="mb-5">
+                    <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-2 pb-1 border-b border-slate-300">
+                        Desglose de Partidas Técnicas y Estimación de Horas
+                    </h3>
+                    <table className="w-full text-left text-[10px] border-collapse border border-slate-300">
+                        <thead>
+                            <tr className="bg-slate-100 text-slate-800 border-b border-slate-300">
+                                <th className="py-2 px-2.5 font-bold border-r border-slate-300">Módulo / Partida</th>
+                                <th className="py-2 px-2.5 font-bold border-r border-slate-300">Alcance & Criterios Técnicos</th>
+                                <th className="py-2 px-2 text-center font-bold border-r border-slate-300 w-12">Dev</th>
+                                <th className="py-2 px-2 text-center font-bold border-r border-slate-300 w-12">Int</th>
+                                <th className="py-2 px-2 text-center font-bold border-r border-slate-300 w-12">QA</th>
+                                <th className="py-2 px-2 text-center font-bold border-r border-slate-300 w-14">Total Hs</th>
+                                <th className="py-2 px-2.5 text-right font-bold w-24">Subtotal USD</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {quote.items?.map((item, idx) => (
+                                <tr key={item.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
+                                    <td className="py-1.5 px-2.5 border-r border-t border-slate-300 align-top">
+                                        <span className="font-bold text-slate-900 block">{item.name}</span>
+                                        <span className="text-[8px] text-slate-500 uppercase">{item.category}</span>
+                                    </td>
+                                    <td className="py-1.5 px-2.5 border-r border-t border-slate-300 align-top text-slate-700">
+                                        {item.description || 'Implementación y validación de funcionalidad'}
+                                    </td>
+                                    <td className="py-1.5 px-2 text-center border-r border-t border-slate-300 align-top">{item.hours_dev}h</td>
+                                    <td className="py-1.5 px-2 text-center border-r border-t border-slate-300 align-top">{item.hours_integration}h</td>
+                                    <td className="py-1.5 px-2 text-center border-r border-t border-slate-300 align-top">{item.hours_testing_qa}h</td>
+                                    <td className="py-1.5 px-2 text-center font-bold border-r border-t border-slate-300 align-top text-slate-900">
+                                        {item.total_hours}h
+                                    </td>
+                                    <td className="py-1.5 px-2.5 text-right font-bold border-t border-slate-300 align-top text-slate-900">
+                                        ${Number(item.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* 4. Resumen Económico y Términos */}
+                <div className="grid grid-cols-12 gap-4 mb-6 page-break-inside-avoid">
+                    <div className="col-span-7 p-3.5 rounded-lg border border-slate-300 bg-slate-50 space-y-2 text-[10px]">
+                        <h4 className="font-bold uppercase tracking-wider text-slate-800 border-b border-slate-200 pb-1">
+                            Condiciones Comerciales & Forma de Pago
+                        </h4>
+                        <p className="text-slate-700 leading-relaxed">{quote.terms_conditions}</p>
+                        {quote.notes && (
+                            <div className="pt-1.5 border-t border-slate-200">
+                                <strong className="text-slate-900">Observaciones:</strong>
+                                <p className="text-slate-600">{quote.notes}</p>
+                            </div>
+                        )}
+                        <p className="text-[9px] text-slate-500 italic pt-1">
+                            * Presupuesto expresado en Dólares Estadounidenses (USD). No incluye impuestos adicionales salvo especificación contraria.
+                        </p>
+                    </div>
+
+                    <div className="col-span-5 p-3.5 rounded-lg border-2 border-slate-900 bg-white space-y-1.5 text-[10px]">
+                        <div className="flex justify-between text-slate-700">
+                            <span>Horas Totales de Ingeniería:</span>
+                            <strong className="text-slate-900">{quote.total_hours} hs</strong>
+                        </div>
+                        <div className="flex justify-between text-slate-700">
+                            <span>Tarifa por Hora:</span>
+                            <strong className="text-slate-900">${Number(quote.hourly_rate).toFixed(2)} USD</strong>
+                        </div>
+                        <div className="flex justify-between text-slate-700">
+                            <span>Subtotal Software:</span>
+                            <span className="font-semibold text-slate-900">${Number(quote.subtotal_development).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                        </div>
+                        {Number(quote.subtotal_infrastructure_setup) > 0 && (
+                            <div className="flex justify-between text-slate-700">
+                                <span>Setup Infraestructura Cloud:</span>
+                                <span className="font-semibold text-slate-900">+${Number(quote.subtotal_infrastructure_setup).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                            </div>
+                        )}
+                        {Number(quote.subtotal_infrastructure_monthly) > 0 && (
+                            <div className="flex justify-between text-indigo-700">
+                                <span>Costo Mensual Cloud Est.:</span>
+                                <span className="font-semibold">${Number(quote.subtotal_infrastructure_monthly).toLocaleString('en-US', { minimumFractionDigits: 2 })}/mes</span>
+                            </div>
+                        )}
+                        {Number(quote.discount_amount) > 0 && (
+                            <div className="flex justify-between text-emerald-700">
+                                <span>Bonificación Comercial ({quote.discount_percentage}%):</span>
+                                <span className="font-bold">-${Number(quote.discount_amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                            </div>
+                        )}
+                        <div className="pt-2 border-t-2 border-slate-900 flex justify-between items-center text-sm font-bold">
+                            <span className="text-slate-900">Total Inversión:</span>
+                            <span className="text-base font-extrabold text-slate-900 font-mono">
+                                ${Number(quote.total_amount).toLocaleString('en-US', { minimumFractionDigits: 2 })} USD
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* 5. Bloque Formal de Firmas */}
+                <div className="grid grid-cols-2 gap-8 pt-6 border-t border-slate-300 page-break-inside-avoid mb-4">
+                    <div className="text-center pt-8 border-t border-slate-400">
+                        <p className="font-bold text-slate-900 text-[11px]">Por GRUPO XAMANEN</p>
+                        <p className="text-[9px] text-slate-500">Firma y Sello Comercial Autorizado</p>
+                    </div>
+
+                    <div className="text-center pt-8 border-t border-slate-400">
+                        <p className="font-bold text-slate-900 text-[11px]">Conformidad y Aceptación del Cliente</p>
+                        <p className="text-[9px] text-slate-500">Firma, Aclaración y Fecha de Aprobación</p>
+                    </div>
+                </div>
+
+                {/* 6. Pie de Página Corporativo */}
+                <div className="text-center pt-3 border-t border-slate-200 text-[8px] text-slate-400">
+                    Documento de cotización confidencial emitido por Grupo Xamanen • Todos los derechos reservados.
                 </div>
             </div>
         </AppLayout>
