@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ClientPortalController;
 use App\Http\Controllers\ProfileController;
@@ -42,6 +44,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Módulo Calendario & Disponibilidad Laboral (Lunes a Viernes)
     Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
+
+    // Módulo Catálogo & Matriz de Horas IA
+    Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
+    Route::post('/catalog', [CatalogController::class, 'store'])->name('catalog.store');
+    Route::patch('/catalog/{feature}', [CatalogController::class, 'update'])->name('catalog.update');
+
+    // Módulo Administración & Roles del Sistema
+    Route::get('/admin/users', [AdminController::class, 'index'])->name('admin.users.index');
+    Route::post('/admin/users', [AdminController::class, 'store'])->name('admin.users.store');
+    Route::patch('/admin/users/{user}', [AdminController::class, 'update'])->name('admin.users.update');
+    Route::patch('/admin/users/{user}/toggle', [AdminController::class, 'toggleStatus'])->name('admin.users.toggle');
 
     // Portal del Cliente
     Route::get('/portal', [ClientPortalController::class, 'index'])->name('portal.dashboard');

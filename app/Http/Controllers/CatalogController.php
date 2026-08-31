@@ -1,0 +1,154 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Feature;
+use App\Models\SoftwareType;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
+
+class CatalogController extends Controller
+{
+    /**
+     * Catálogo de Módulos y Matriz de Esfuerzo IA
+     */
+    public function index(Request $request): Response
+    {
+        $query = Feature::with('softwareTypes')->orderBy('category')->orderBy('name');
+
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+
+        if ($request->filled('preset')) {
+            $preset = $request->preset;
+            if ($preset === 'mining') {
+                $query->where('is_preset_mining', true);
+            } elseif ($preset === 'environment') {
+                $query->where('is_preset_environment', true);
+            } elseif ($preset === 'commerce') {
+                $query->where('is_preset_commerce', true);
+            }
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('category', 'like', "%{$search}%");
+            });
+        }
+
+        $features = $query->paginate(15)->withQueryString();
+        $softwareTypes = SoftwareType::all();
+
+        // Categorías únicas
+        $categories = Feature::distinct()->pluck('category')->filter()->values();
+
+        $metrics = [
+            'total_features' => Feature::count(),
+            'mining_preset_count' => Feature::where('is_preset_mining', true)->count(),
+            'environment_preset_count' => Feature::where('is_preset_environment', true)->count(),
+            'commerce_preset_count' => Feature::where('is_preset_commerce', true)->count(),
+            'avg_dev_hours' => round(Feature::avg('hours_dev'), 1),
+            'avg_qa_hours' => round(Feature::avg('hours_testing_qa'), 1),
+        ];
+
+        return Inertia::render('Catalog/Index', [
+            'features' => $features,
+            'softwareTypes' => $softwareTypes,
+            'categories' => $categories,
+            'filters' => $request->only(['category', 'preset', 'search']),
+            'metrics' => $metrics,
+        ]);
+    }
+
+    /**
+     * Guardar nuevo módulo en el catálogo
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'category' => 'required|string|max:100',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'hours_dev' => 'required|numeric|min:0',
+            'hours_integration' => 'required|numeric|min:0',
+            'hours_testing_qa' => 'required|numeric|min:0',
+            'cost_setup_infra' => 'required|numeric|min:0',
+            'cost_monthly_infra' => 'required|numeric|min:0',
+            'is_preset_mining' => 'nullable|boolean',
+            'is_preset_environment' => 'nullable|boolean',
+            'is_preset_commerce' => 'nullable|boolean',
+            'software_type_ids' => 'nullable|array',
+            'software_type_ids.*' => 'exists:software_types,id',
+        ]);
+
+        $feature = Feature::create([
+            'category' => $validated['category'],
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
+            'hours_dev' => $validated['hours_dev'],
+            'hours_integration' => $validated['hours_integration'],
+            'hours_testing_qa' => $validated['hours_testing_qa'],
+            'cost_setup_infra' => $validated['cost_setup_infra'],
+            'cost_monthly_infra' => $validated['cost_monthly_infra'],
+            'is_preset_mining' => $validated['is_preset_mining'] ?? false,
+            'is_preset_environment' => $validated['is_preset_environment'] ?? false,
+            'is_preset_commerce' => $validated['is_preset_commerce'] ?? false,
+            'is_active' => true,
+        ]);
+
+        if (!empty($validated['software_type_ids'])) {
+            $feature->softwareTypes()->sync($validated['software_type_ids']);
+        }
+
+        return back()->with('success', "Módulo '{$feature->name}' creado exitosamente en el catálogo.");
+    }
+
+    /**
+     * Actualizar módulo y horas de la matriz IA
+     */
+    public function update(Request $request, Feature $feature)
+    {
+        $validated = $request->validate([
+            'category' => 'required|string|max:100',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'hours_dev' => 'required|numeric|min:0',
+            'hours_integration' => 'required|numeric|min:0',
+            'hours_testing_qa' => 'required|numeric|min:0',
+            'cost_setup_infra' => 'required|numeric|min:0',
+            'cost_monthly_infra' => 'required|numeric|min:0',
+            'is_preset_mining' => 'nullable|boolean',
+            'is_preset_environment' => 'nullable|boolean',
+            'is_preset_commerce' => 'nullable|boolean',
+            'is_active' => 'nullable|boolean',
+            'software_type_ids' => 'nullable|array',
+            'software_type_ids.*' => 'exists:software_types,id',
+        ]);
+
+        $feature->update([
+            'category' => $validated['category'],
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
+            'hours_dev' => $validated['hours_dev'],
+            'hours_integration' => $validated['hours_integration'],
+            'hours_testing_qa' => $validated['hours_testing_qa'],
+            'cost_setup_infra' => $validated['cost_setup_infra'],
+            'cost_monthly_infra' => $validated['cost_monthly_infra'],
+            'is_preset_mining' => $validated['is_preset_mining'] ?? false,
+            'is_preset_environment' => $validated['is_preset_environment'] ?? false,
+            'is_preset_commerce' => $validated['is_preset_commerce'] ?? false,
+            'is_active' => $validated['is_active'] ?? true,
+        ]);
+
+        if (isset($validated['software_type_ids'])) {
+            $feature->softwareTypes()->sync($validated['software_type_ids']);
+        }
+
+        return back()->with('success', "Módulo '{$feature->name}' actualizado.");
+    }
+}

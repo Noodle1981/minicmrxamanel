@@ -114,13 +114,15 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
         },
         {
             name: 'Catálogo & Matriz IA',
-            href: '#',
+            href: route('catalog.index'),
+            routePattern: 'catalog.*',
             icon: Layers,
             roles: ['super_admin'],
         },
         {
             name: 'Administración & Roles',
-            href: '#',
+            href: route('admin.users.index'),
+            routePattern: 'admin.*',
             icon: Shield,
             roles: ['super_admin'],
         },
