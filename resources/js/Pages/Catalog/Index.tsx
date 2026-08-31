@@ -148,13 +148,14 @@ export default function Index({ features, softwareTypes, categories, filters, me
     return (
         <AppLayout
             header={
-                <div className="flex items-center gap-3 min-w-0">
-                    <div className="p-2 rounded-lg bg-[#30EEE2]/10 border border-[#30EEE2]/20 shrink-0">
-                        <Layers className="w-5 h-5 text-[#30EEE2]" />
+                <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                    <div className="p-1.5 sm:p-2 rounded-lg bg-[#30EEE2]/10 border border-[#30EEE2]/20 shrink-0">
+                        <Layers className="w-4 h-4 sm:w-5 sm:h-5 text-[#30EEE2]" />
                     </div>
                     <div className="min-w-0">
-                        <h2 className="text-sm sm:text-xl font-heading font-bold text-white leading-tight truncate">
-                            Catálogo & Matriz de Esfuerzo IA
+                        <h2 className="text-sm sm:text-xl font-heading font-bold text-white leading-tight whitespace-nowrap">
+                            <span className="sm:hidden">Catálogo</span>
+                            <span className="hidden sm:inline">Catálogo & Matriz de Esfuerzo IA</span>
                         </h2>
                         <p className="text-xs text-white/50 hidden sm:block truncate">
                             Parámetros técnicos de desarrollo, horas de ingeniería y presets industriales

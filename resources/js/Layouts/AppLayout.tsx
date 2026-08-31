@@ -269,18 +269,19 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
             {/* ==================== CONTENIDO PRINCIPAL CON SCROLL INDEPENDIENTE ==================== */}
             <div className="flex-1 flex flex-col min-w-0 h-full overflow-y-auto custom-scrollbar">
                 {/* Header Superior Navbar (Sticky Pinned) */}
-                <header className="h-20 bg-[#101522]/90 backdrop-blur-xl border-b border-white/10 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 shrink-0 gap-3">
-                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                <header className="h-16 sm:h-20 bg-[#101522]/90 backdrop-blur-xl border-b border-white/10 px-3 sm:px-6 flex items-center justify-between sticky top-0 z-30 shrink-0 gap-2 sm:gap-4">
+                    <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                         <button
                             onClick={() => setSidebarOpen(true)}
-                            className="md:hidden p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/5 shrink-0"
+                            className="md:hidden p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/5 shrink-0"
+                            aria-label="Abrir menú"
                         >
-                            <Menu className="w-6 h-6" />
+                            <Menu className="w-5 h-5" />
                         </button>
                         <div className="min-w-0 flex-1">
                             {header || (
                                 <h1 className="text-sm sm:text-lg font-heading font-semibold text-white truncate">
-                                    Plataforma de Presupuestación & Gestión
+                                    Xamanen CPQ
                                 </h1>
                             )}
                         </div>

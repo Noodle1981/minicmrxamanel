@@ -77,13 +77,14 @@ export default function Index({ projects, filters, clients, metrics }: IndexProp
     return (
         <AppLayout
             header={
-                <div className="flex items-center gap-3 min-w-0">
-                    <div className="p-2 rounded-lg bg-[#30EEE2]/10 border border-[#30EEE2]/20 shrink-0">
-                        <FolderKanban className="w-5 h-5 text-[#30EEE2]" />
+                <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                    <div className="p-1.5 sm:p-2 rounded-lg bg-[#30EEE2]/10 border border-[#30EEE2]/20 shrink-0">
+                        <FolderKanban className="w-4 h-4 sm:w-5 sm:h-5 text-[#30EEE2]" />
                     </div>
                     <div className="min-w-0">
-                        <h2 className="text-sm sm:text-xl font-heading font-bold text-white leading-tight truncate">
-                            Proyectos & Obras de Software
+                        <h2 className="text-sm sm:text-xl font-heading font-bold text-white leading-tight whitespace-nowrap">
+                            <span className="sm:hidden">Proyectos</span>
+                            <span className="hidden sm:inline">Proyectos & Obras de Software</span>
                         </h2>
                         <p className="text-xs text-white/50 hidden sm:block truncate">
                             Gestión operativa del ciclo de vida y avance de tickets
