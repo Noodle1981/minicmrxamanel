@@ -310,13 +310,13 @@ export default function Index({ features, softwareTypes, categories, filters, me
                     <table className="w-full text-left text-xs">
                         <thead className="bg-white/[0.04] text-white/60 uppercase text-[10px] tracking-wider border-b border-white/15">
                             <tr>
-                                <th className="py-4 px-5 min-w-[360px]">Módulo / Feature & Alcance Técnico</th>
-                                <th className="py-4 px-5 min-w-[140px]">Categoría</th>
-                                <th className="py-4 px-5 text-center whitespace-nowrap">Matriz de Horas (Dev / Int / QA)</th>
-                                <th className="py-4 px-5 text-center whitespace-nowrap">Total hs</th>
-                                <th className="py-4 px-5 text-center whitespace-nowrap">Infraestructura</th>
-                                <th className="py-4 px-5 text-center whitespace-nowrap">Presets</th>
-                                <th className="py-4 px-5 text-right whitespace-nowrap">Acción</th>
+                                <th className="py-3.5 px-4">Módulo & Alcance Técnico</th>
+                                <th className="py-3.5 px-3 min-w-[120px]">Categoría</th>
+                                <th className="py-3.5 px-3 text-center whitespace-nowrap">Matriz (Dev/Int/QA)</th>
+                                <th className="py-3.5 px-3 text-center whitespace-nowrap">Total</th>
+                                <th className="py-3.5 px-3 text-center whitespace-nowrap">Infraestructura</th>
+                                <th className="py-3.5 px-3 text-center whitespace-nowrap">Presets</th>
+                                <th className="py-3.5 px-4 text-right whitespace-nowrap"></th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-white/10">
@@ -325,88 +325,88 @@ export default function Index({ features, softwareTypes, categories, filters, me
 
                                 return (
                                     <tr key={feat.id} className="hover:bg-white/[0.03] transition-colors">
-                                        <td className="py-5 px-5 align-top">
+                                        <td className="py-4 px-4 align-top">
                                             <div className="font-heading font-bold text-white text-[13px] tracking-tight">
                                                 {feat.name}
                                             </div>
                                             {feat.description && (
-                                                <p className="text-[11px] text-white/55 mt-1.5 leading-relaxed max-w-xl">
+                                                <p className="text-[11px] text-white/55 mt-1 leading-relaxed max-w-xl">
                                                     {feat.description}
                                                 </p>
                                             )}
                                         </td>
 
-                                        <td className="py-5 px-5 align-top">
+                                        <td className="py-4 px-3 align-top">
                                             <span className="text-[10px] px-2.5 py-1 rounded-md bg-white/[0.06] text-white/80 border border-white/10 font-semibold inline-block">
                                                 {feat.category}
                                             </span>
                                         </td>
 
-                                        <td className="py-5 px-5 text-center align-top whitespace-nowrap">
-                                            <div className="flex items-center justify-center gap-1.5 font-mono text-xs">
-                                                <span className="text-indigo-300 font-bold bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20" title="Horas Dev">{feat.hours_dev}d Dev</span>
+                                        <td className="py-4 px-3 text-center align-top whitespace-nowrap">
+                                            <div className="flex items-center justify-center gap-1 font-mono text-xs">
+                                                <span className="text-indigo-300 font-bold bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20" title="Horas Dev">{feat.hours_dev}d</span>
                                                 <span className="text-white/30">+</span>
-                                                <span className="text-cyan-300 font-bold bg-cyan-500/10 px-1.5 py-0.5 rounded border border-cyan-500/20" title="Horas Integración">{feat.hours_integration}i Int</span>
+                                                <span className="text-cyan-300 font-bold bg-cyan-500/10 px-1.5 py-0.5 rounded border border-cyan-500/20" title="Horas Integración">{feat.hours_integration}i</span>
                                                 <span className="text-white/30">+</span>
-                                                <span className="text-amber-300 font-bold bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20" title="Horas QA">{feat.hours_testing_qa}q QA</span>
+                                                <span className="text-amber-300 font-bold bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20" title="Horas QA">{feat.hours_testing_qa}q</span>
                                             </div>
                                         </td>
 
-                                        <td className="py-5 px-5 text-center align-top whitespace-nowrap">
+                                        <td className="py-4 px-3 text-center align-top whitespace-nowrap">
                                             <span className="font-heading font-extrabold text-[#30EEE2] text-sm block">
-                                                {totalHours} hs
+                                                {totalHours}h
                                             </span>
                                         </td>
 
-                                        <td className="py-5 px-5 text-center align-top font-mono text-xs text-white/70 whitespace-nowrap">
+                                        <td className="py-4 px-3 text-center align-top font-mono text-xs text-white/70 whitespace-nowrap">
                                             {feat.cost_setup_infra > 0 || feat.cost_monthly_infra > 0 ? (
                                                 <div>
-                                                    <div className="text-white font-medium">${feat.cost_setup_infra} setup</div>
-                                                    <div className="text-[10px] text-purple-300">${feat.cost_monthly_infra}/mes</div>
+                                                    <div className="text-white font-medium">${feat.cost_setup_infra}</div>
+                                                    <div className="text-[10px] text-purple-300">${feat.cost_monthly_infra}/m</div>
                                                 </div>
                                             ) : (
                                                 <span className="text-white/30">—</span>
                                             )}
                                         </td>
 
-                                        <td className="py-5 px-5 text-center align-top">
-                                            <div className="flex flex-wrap items-center justify-center gap-1 max-w-[160px] mx-auto">
+                                        <td className="py-4 px-3 text-center align-top">
+                                            <div className="flex items-center justify-center gap-1">
                                                 {feat.is_preset_mining && (
-                                                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-medium" title="Minería">
-                                                        ⛏️ Min
+                                                    <span className="w-6 h-6 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center hover:scale-110 transition-transform cursor-help" title="Preset: Minería & HSE">
+                                                        <HardHat className="w-3.5 h-3.5" />
                                                     </span>
                                                 )}
                                                 {feat.is_preset_environment && (
-                                                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-medium" title="Medio Ambiente">
-                                                        🌱 Amb
+                                                    <span className="w-6 h-6 rounded-md bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center hover:scale-110 transition-transform cursor-help" title="Preset: Medio Ambiente">
+                                                        <Leaf className="w-3.5 h-3.5" />
                                                     </span>
                                                 )}
                                                 {feat.is_preset_commerce && (
-                                                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 font-medium" title="Comercio">
-                                                        🛒 Com
+                                                    <span className="w-6 h-6 rounded-md bg-blue-500/15 border border-blue-500/30 text-blue-400 flex items-center justify-center hover:scale-110 transition-transform cursor-help" title="Preset: E-Commerce & B2B">
+                                                        <ShoppingCart className="w-3.5 h-3.5" />
                                                     </span>
                                                 )}
                                                 {feat.is_preset_industry && (
-                                                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 font-medium" title="Industria">
-                                                        🏭 Ind
+                                                    <span className="w-6 h-6 rounded-md bg-purple-500/15 border border-purple-500/30 text-purple-400 flex items-center justify-center hover:scale-110 transition-transform cursor-help" title="Preset: Industria & Planta">
+                                                        <Factory className="w-3.5 h-3.5" />
                                                     </span>
                                                 )}
                                                 {feat.is_preset_services && (
-                                                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30 font-medium" title="Servicios">
-                                                        💼 Srv
+                                                    <span className="w-6 h-6 rounded-md bg-teal-500/15 border border-teal-500/30 text-teal-400 flex items-center justify-center hover:scale-110 transition-transform cursor-help" title="Preset: Servicios & Consultoría">
+                                                        <Briefcase className="w-3.5 h-3.5" />
                                                     </span>
                                                 )}
                                             </div>
                                         </td>
 
-                                        <td className="py-5 px-5 text-right align-top whitespace-nowrap">
+                                        <td className="py-4 px-4 text-right align-top whitespace-nowrap">
                                             <button
                                                 type="button"
                                                 onClick={() => openEditModal(feat)}
-                                                className="btn-xamanen-secondary text-[11px] px-3 py-1.5 inline-flex items-center gap-1"
+                                                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-[#30EEE2] border border-white/10 hover:border-[#30EEE2]/40 transition-all inline-flex items-center justify-center shadow-sm"
+                                                title="Editar Módulo"
                                             >
                                                 <Edit className="w-3.5 h-3.5" />
-                                                Editar
                                             </button>
                                         </td>
                                     </tr>
