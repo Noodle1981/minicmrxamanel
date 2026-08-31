@@ -81,19 +81,19 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
         },
         {
             name: 'Proyectos & Obras',
-            href: '#',
+            href: route('projects.index'),
             icon: FolderKanban,
             roles: ['super_admin', 'vendedor', 'desarrollador', 'disenador', 'qa_tester', 'validador'],
         },
         {
             name: 'Tablero de Tickets',
-            href: '#',
+            href: route('tickets.index'),
             icon: CheckSquare,
             roles: ['super_admin', 'desarrollador', 'disenador', 'qa_tester', 'validador'],
         },
         {
             name: 'Calendario & Carga',
-            href: '#',
+            href: route('calendar.index'),
             icon: Calendar,
             roles: ['super_admin', 'desarrollador', 'disenador', 'qa_tester', 'validador', 'vendedor'],
         },

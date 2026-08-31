@@ -252,7 +252,7 @@ class QuoteController extends Controller
     /**
      * Actualizar estado comercial de la cotización
      */
-    public function updateStatus(Request $request, Quote $quote)
+    public function updateStatus(Request $request, Quote $quote, \App\Services\ProjectService $projectService)
     {
         $validated = $request->validate([
             'status' => 'required|in:draft,sent,under_review,accepted,rejected',
@@ -263,12 +263,19 @@ class QuoteController extends Controller
 
         if ($validated['status'] === 'accepted') {
             $updateData['accepted_at'] = Carbon::now();
+            $quote->update($updateData);
+
+            // Generación automática de Proyecto y Tickets
+            $project = $projectService->createProjectFromQuote($quote, $request->user());
+
+            return back()->with('success', '¡Presupuesto aceptado! Se ha generado automáticamente el proyecto ' . $project->code . ' con sus tickets de trabajo.');
         } elseif ($validated['status'] === 'rejected') {
             $updateData['rejected_at'] = Carbon::now();
             $updateData['rejection_reason'] = $validated['rejection_reason'] ?? null;
+            $quote->update($updateData);
+        } else {
+            $quote->update($updateData);
         }
-
-        $quote->update($updateData);
 
         return back()->with('success', 'Estado del presupuesto actualizado a: ' . strtoupper($validated['status']));
     }

@@ -61,7 +61,7 @@ class ClientPortalController extends Controller
     /**
      * Acción de Aceptación o Rechazo formal por parte del Cliente
      */
-    public function respondQuote(Request $request, Quote $quote)
+    public function respondQuote(Request $request, Quote $quote, \App\Services\ProjectService $projectService)
     {
         $validated = $request->validate([
             'action' => 'required|in:accept,reject',
@@ -73,6 +73,9 @@ class ClientPortalController extends Controller
                 'status' => 'accepted',
                 'accepted_at' => Carbon::now(),
             ]);
+
+            // Generación automática del Proyecto Operativo
+            $projectService->createProjectFromQuote($quote);
 
             // Agregar comentario de aceptación si se incluyó mensaje
             if (!empty($validated['feedback'])) {

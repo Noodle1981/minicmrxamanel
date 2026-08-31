@@ -1,9 +1,12 @@
 <?php
 
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ClientPortalController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\QuoteController;
+use App\Http\Controllers\TicketController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -25,6 +28,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Módulo CPQ / Cotizaciones
     Route::resource('quotes', QuoteController::class)->only(['index', 'create', 'store', 'show']);
     Route::patch('quotes/{quote}/status', [QuoteController::class, 'updateStatus'])->name('quotes.status.update');
+
+    // Módulo Proyectos & Obras Operativas
+    Route::resource('projects', ProjectController::class)->only(['index', 'show']);
+    Route::patch('projects/{project}/status', [ProjectController::class, 'updateStatus'])->name('projects.status.update');
+
+    // Módulo Tablero de Tickets & Asignaciones Multi-Rol
+    Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');
+    Route::patch('/tickets/{ticket}', [TicketController::class, 'update'])->name('tickets.update');
+    Route::post('/tickets/{ticket}/assign', [TicketController::class, 'assign'])->name('tickets.assign');
+    Route::post('/tickets/{ticket}/unassign', [TicketController::class, 'unassign'])->name('tickets.unassign');
+    Route::post('/tickets/{ticket}/comments', [TicketController::class, 'addComment'])->name('tickets.comments.store');
+
+    // Módulo Calendario & Disponibilidad Laboral (Lunes a Viernes)
+    Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
 
     // Portal del Cliente
     Route::get('/portal', [ClientPortalController::class, 'index'])->name('portal.dashboard');
