@@ -62,16 +62,16 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
         },
         {
             name: 'Cotizador CPQ',
-            href: '#',
+            href: route('quotes.create'),
             icon: Calculator,
             roles: ['super_admin', 'vendedor'],
             badge: 'Aurora',
         },
         {
-            name: 'Clientes (Mini-CRM)',
-            href: '#',
-            icon: Users,
-            roles: ['super_admin', 'vendedor'],
+            name: 'Historial Cotizaciones',
+            href: route('quotes.index'),
+            icon: FileText,
+            roles: ['super_admin', 'vendedor', 'cliente'],
         },
         {
             name: 'Proyectos & Obras',
