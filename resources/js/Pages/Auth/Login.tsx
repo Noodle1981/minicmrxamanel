@@ -85,15 +85,6 @@ export default function Login({
             badgeColor: 'bg-pink-500/25 text-pink-300 border-pink-500/50',
             borderHover: 'hover:border-pink-400/50',
         },
-        {
-            name: 'Ing. Carlos Mendoza',
-            email: 'contacto@mineraandina.com',
-            roleLabel: 'Portal Cliente',
-            roleDesc: 'Minera Los Andes (Aprobar o rechazar cotizaciones)',
-            icon: Building2,
-            badgeColor: 'bg-emerald-500/25 text-emerald-300 border-emerald-500/50',
-            borderHover: 'hover:border-emerald-400/50',
-        },
     ];
 
     const selectTestUser = (user: TestUser) => {
@@ -149,7 +140,7 @@ export default function Login({
                                         isSelected
                                             ? 'bg-[#30EEE2]/10 border-[#30EEE2] shadow-lg shadow-[#30EEE2]/10'
                                             : 'bg-white/[0.02] border-white/10 hover:bg-white/5 ' + u.borderHover
-                                    } ${idx === testUsers.length - 1 ? 'sm:col-span-2' : ''}`}
+                                    }`}
                                 >
                                     <div className="p-1.5 rounded-lg bg-white/5 text-white/80 shrink-0 mt-0.5">
                                         <Icon className="w-4 h-4" />
