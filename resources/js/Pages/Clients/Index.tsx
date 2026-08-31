@@ -36,9 +36,9 @@ interface IndexProps {
     };
     metrics: {
         total_clients: number;
-        mining_clients: number;
-        environment_clients: number;
-        commerce_clients: number;
+        mining_count: number;
+        environment_count: number;
+        commerce_count: number;
         total_quotes: number;
     };
 }
