@@ -22,6 +22,9 @@ class ProjectService
                 return $quote->project;
             }
 
+            // Cargar relaciones necesarias
+            $quote->loadMissing(['softwareType', 'client', 'items.feature']);
+
             // 1. Generar código de proyecto (ej. PRJ-2026-0001)
             $year = date('Y');
             $lastProject = Project::whereYear('created_at', $year)->orderBy('id', 'desc')->first();
@@ -31,6 +34,9 @@ class ProjectService
             }
             $projectCode = sprintf('PRJ-%s-%04d', $year, $nextNum);
 
+            $softwareTypeName = $quote->softwareType?->name ?? 'Software a Medida';
+            $businessDays = (int) ($quote->estimated_business_days ?: 10);
+
             // 2. Crear Proyecto
             $project = Project::create([
                 'quote_id' => $quote->id,
@@ -38,16 +44,13 @@ class ProjectService
                 'manager_id' => $manager ? $manager->id : $quote->created_by,
                 'code' => $projectCode,
                 'name' => $quote->title,
-                'description' => "Proyecto originado a partir del presupuesto {$quote->quote_number}. Tipo: {$quote->software_type->name}.",
+                'description' => "Proyecto originado a partir del presupuesto {$quote->quote_number}. Tipo: {$softwareTypeName}.",
                 'status' => 'pending_start',
                 'priority' => 'high',
-                'start_date' => $quote->estimated_start_date ?? Carbon::now()->toDateString(),
-                'due_date' => $quote->estimated_delivery_date ?? Carbon::now()->addDays($quote->estimated_business_days)->toDateString(),
+                'start_date' => $quote->estimated_start_date ? Carbon::parse($quote->estimated_start_date)->toDateString() : Carbon::now()->toDateString(),
+                'due_date' => $quote->estimated_delivery_date ? Carbon::parse($quote->estimated_delivery_date)->toDateString() : Carbon::now()->addDays($businessDays)->toDateString(),
                 'progress_percentage' => 0,
             ]);
-
-            // 3. Generar Tickets a partir de los QuoteItems
-            $quote->loadMissing('items.feature');
             $ticketOrder = 1;
 
             foreach ($quote->items as $item) {
