@@ -78,45 +78,52 @@ export default function Index({ month, monthName, daysInMonth, projects, summary
     return (
         <AppLayout
             header={
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-[#30EEE2]/10 border border-[#30EEE2]/20">
-                            <CalendarIcon className="w-5 h-5 text-[#30EEE2]" />
-                        </div>
-                        <div>
-                            <h2 className="text-xl font-heading font-bold text-white leading-tight">
-                                Calendario de Disponibilidad & Carga Laboral
-                            </h2>
-                            <p className="text-xs text-white/50">
-                                Planificación en días hábiles (Lunes a Viernes) y seguimiento de hitos de entrega
-                            </p>
-                        </div>
+                <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-[#30EEE2]/10 border border-[#30EEE2]/20">
+                        <CalendarIcon className="w-5 h-5 text-[#30EEE2]" />
                     </div>
-
-                    {/* Navegación de Mes */}
-                    <div className="flex items-center gap-2">
-                        <button
-                            type="button"
-                            onClick={handlePrevMonth}
-                            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 transition-colors"
-                        >
-                            <ChevronLeft className="w-4 h-4" />
-                        </button>
-                        <span className="text-sm font-heading font-bold text-white capitalize px-3">
-                            {monthName}
-                        </span>
-                        <button
-                            type="button"
-                            onClick={handleNextMonth}
-                            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 transition-colors"
-                        >
-                            <ChevronRight className="w-4 h-4" />
-                        </button>
+                    <div>
+                        <h2 className="text-xl font-heading font-bold text-white leading-tight">
+                            Calendario de Disponibilidad & Carga Laboral
+                        </h2>
+                        <p className="text-xs text-white/50">
+                            Planificación en días hábiles (Lunes a Viernes) y seguimiento de hitos de entrega
+                        </p>
                     </div>
                 </div>
             }
         >
             <Head title="Calendario & Disponibilidad" />
+
+            {/* Barra de Control de Período / Mes (En el Cuerpo) */}
+            <div className="glass-panel p-4 mb-6 flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <h3 className="text-sm font-heading font-bold text-white">Planificación Mensual</h3>
+                    <p className="text-xs text-white/50">Cálculo de horas comprometidas y capacidad del equipo técnico</p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <button
+                        type="button"
+                        onClick={handlePrevMonth}
+                        className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 transition-colors"
+                        title="Mes Anterior"
+                    >
+                        <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <span className="text-sm font-heading font-bold text-white capitalize px-3">
+                        {monthName}
+                    </span>
+                    <button
+                        type="button"
+                        onClick={handleNextMonth}
+                        className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 transition-colors"
+                        title="Mes Siguiente"
+                    >
+                        <ChevronRight className="w-4 h-4" />
+                    </button>
+                </div>
+            </div>
 
             {/* Resumen de Capacidad del Mes */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">

@@ -77,32 +77,37 @@ export default function Index({ projects, filters, clients, metrics }: IndexProp
     return (
         <AppLayout
             header={
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-[#30EEE2]/10 border border-[#30EEE2]/20">
-                            <FolderKanban className="w-5 h-5 text-[#30EEE2]" />
-                        </div>
-                        <div>
-                            <h2 className="text-xl font-heading font-bold text-white leading-tight">
-                                Proyectos & Obras de Software
-                            </h2>
-                            <p className="text-xs text-white/50">
-                                Gestión operativa del ciclo de vida y avance de tickets
-                            </p>
-                        </div>
+                <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-[#30EEE2]/10 border border-[#30EEE2]/20">
+                        <FolderKanban className="w-5 h-5 text-[#30EEE2]" />
                     </div>
-
-                    <Link
-                        href={route('tickets.index')}
-                        className="btn-xamanen-secondary text-xs"
-                    >
-                        <CheckSquare className="w-4 h-4 text-[#30EEE2]" />
-                        Ver Tablero Kanban Global
-                    </Link>
+                    <div>
+                        <h2 className="text-xl font-heading font-bold text-white leading-tight">
+                            Proyectos & Obras de Software
+                        </h2>
+                        <p className="text-xs text-white/50">
+                            Gestión operativa del ciclo de vida y avance de tickets
+                        </p>
+                    </div>
                 </div>
             }
         >
             <Head title="Proyectos Operativos" />
+
+            {/* Barra de Acciones del Cuerpo */}
+            <div className="flex items-center justify-between gap-4 mb-6">
+                <div>
+                    <h3 className="text-sm font-heading font-bold text-white">Obras en Ejecución</h3>
+                    <p className="text-xs text-white/50">Monitoreo de hitos, avance porcentual y asignación de tareas</p>
+                </div>
+                <Link
+                    href={route('tickets.index')}
+                    className="btn-xamanen-secondary text-xs shrink-0"
+                >
+                    <CheckSquare className="w-4 h-4 text-[#30EEE2]" />
+                    Ver Tablero Kanban Global
+                </Link>
+            </div>
 
             {/* KPIs de Proyectos */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

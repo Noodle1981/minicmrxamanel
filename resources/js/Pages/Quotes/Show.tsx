@@ -69,32 +69,41 @@ export default function Show({ quote }: ShowProps) {
     return (
         <AppLayout
             header={
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <Link
-                            href={route('quotes.index')}
-                            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors"
-                            title="Volver"
-                        >
-                            <ArrowLeft className="w-4 h-4" />
-                        </Link>
-                        <div>
-                            <div className="flex items-center gap-2">
-                                <h2 className="text-xl font-heading font-bold text-white leading-tight">
-                                    Presupuesto {quote.quote_number}
-                                </h2>
-                                <span
-                                    className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${CurrentStatus.class}`}
-                                >
-                                    <StatusIcon className="w-3 h-3" />
-                                    {CurrentStatus.label}
-                                </span>
-                            </div>
-                            <p className="text-xs text-white/50">{quote.title}</p>
+                <div className="flex items-center gap-3">
+                    <Link
+                        href={route('quotes.index')}
+                        className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors"
+                        title="Volver"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                    </Link>
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <h2 className="text-xl font-heading font-bold text-white leading-tight">
+                                Presupuesto {quote.quote_number}
+                            </h2>
+                            <span
+                                className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${CurrentStatus.class}`}
+                            >
+                                <StatusIcon className="w-3 h-3" />
+                                {CurrentStatus.label}
+                            </span>
                         </div>
+                        <p className="text-xs text-white/50">{quote.title}</p>
+                    </div>
+                </div>
+            }
+        >
+            <Head title={`Presupuesto ${quote.quote_number}`} />
+
+            <div className="space-y-6 max-w-5xl mx-auto print:max-w-none print:text-black">
+                {/* Barra de Acciones del Documento (En el Cuerpo) */}
+                <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl glass-panel print:hidden">
+                    <div className="text-xs text-white/60">
+                        Acciones comerciales para el presupuesto <strong className="text-white">{quote.quote_number}</strong>
                     </div>
 
-                    <div className="flex items-center gap-2 print:hidden">
+                    <div className="flex items-center gap-2">
                         <button
                             type="button"
                             onClick={handlePrint}
@@ -130,11 +139,6 @@ export default function Show({ quote }: ShowProps) {
                         )}
                     </div>
                 </div>
-            }
-        >
-            <Head title={`Presupuesto ${quote.quote_number}`} />
-
-            <div className="space-y-6 max-w-5xl mx-auto print:max-w-none print:text-black">
                 {/* ==================== CABECERA EJECUTIVA / BRANDING ==================== */}
                 <div className="glass-panel p-8 border-white/10 relative overflow-hidden print:border-none print:shadow-none print:p-0">
                     <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-[#30EEE2]/10 via-[#3C84CE]/5 to-transparent rounded-full blur-3xl pointer-events-none print:hidden"></div>

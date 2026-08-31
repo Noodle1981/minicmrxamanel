@@ -68,56 +68,59 @@ export default function Show({ project, stats, technicalUsers }: ShowProps) {
     return (
         <AppLayout
             header={
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <Link
-                            href={route('projects.index')}
-                            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors"
-                            title="Volver a Proyectos"
-                        >
-                            <ArrowLeft className="w-4 h-4" />
-                        </Link>
-                        <div>
-                            <div className="flex items-center gap-2">
-                                <h2 className="text-xl font-heading font-bold text-white leading-tight">
-                                    {project.name}
-                                </h2>
-                                <span className="font-mono text-xs font-bold text-[#30EEE2]">
-                                    ({project.code})
-                                </span>
-                            </div>
-                            <p className="text-xs text-white/50">
-                                Cliente: <strong className="text-white">{project.client?.company_name}</strong>
-                            </p>
+                <div className="flex items-center gap-3">
+                    <Link
+                        href={route('projects.index')}
+                        className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors"
+                        title="Volver a Proyectos"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                    </Link>
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <h2 className="text-xl font-heading font-bold text-white leading-tight">
+                                {project.name}
+                            </h2>
+                            <span className="font-mono text-xs font-bold text-[#30EEE2]">
+                                ({project.code})
+                            </span>
                         </div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                        {/* Selector de Estado Rápido */}
-                        <select
-                            value={project.status}
-                            onChange={(e) => handleStatusChange(e.target.value)}
-                            className="input-xamanen text-xs py-1.5 bg-[#101522]"
-                        >
-                            <option value="pending_start">Por Iniciar</option>
-                            <option value="in_development">En Desarrollo</option>
-                            <option value="testing_validation">En Testing & QA</option>
-                            <option value="delivered">Entregado</option>
-                            <option value="paused">Pausado</option>
-                        </select>
-
-                        <Link
-                            href={route('tickets.index', { project_id: project.id })}
-                            className="btn-xamanen-primary text-xs px-3.5 py-2"
-                        >
-                            <CheckSquare className="w-3.5 h-3.5" />
-                            Abrir en Kanban
-                        </Link>
+                        <p className="text-xs text-white/50">
+                            Cliente: <strong className="text-white">{project.client?.company_name}</strong>
+                        </p>
                     </div>
                 </div>
             }
         >
             <Head title={`Proyecto ${project.code}`} />
+
+            {/* Barra de Acciones del Proyecto (En el Cuerpo) */}
+            <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl glass-panel mb-6">
+                <div className="flex items-center gap-2">
+                    <span className="text-xs text-white/60">Estado de Obra:</span>
+                    <select
+                        value={project.status}
+                        onChange={(e) => handleStatusChange(e.target.value)}
+                        className="input-xamanen text-xs py-1.5 bg-[#101522]"
+                    >
+                        <option value="pending_start">Por Iniciar</option>
+                        <option value="in_development">En Desarrollo</option>
+                        <option value="testing_validation">En Testing & QA</option>
+                        <option value="delivered">Entregado</option>
+                        <option value="paused">Pausado</option>
+                    </select>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <Link
+                        href={route('tickets.index', { project_id: project.id })}
+                        className="btn-xamanen-primary text-xs px-3.5 py-2 shadow-lg"
+                    >
+                        <CheckSquare className="w-3.5 h-3.5" />
+                        Abrir en Kanban
+                    </Link>
+                </div>
+            </div>
 
             {/* KPIs del Proyecto */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

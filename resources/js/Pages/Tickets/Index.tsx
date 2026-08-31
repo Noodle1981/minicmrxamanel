@@ -156,53 +156,58 @@ export default function Index({ columns, projects, technicalUsers, filters, metr
     return (
         <AppLayout
             header={
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-[#30EEE2]/10 border border-[#30EEE2]/20">
-                            <CheckSquare className="w-5 h-5 text-[#30EEE2]" />
-                        </div>
-                        <div>
-                            <h2 className="text-xl font-heading font-bold text-white leading-tight">
-                                Tablero Kanban de Tickets & Sprints
-                            </h2>
-                            <p className="text-xs text-white/50">
-                                Asignación multi-rol (`Dev`, `QA`, `UI/UX`, `Validador`) y avance operativo
-                            </p>
-                        </div>
+                <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-[#30EEE2]/10 border border-[#30EEE2]/20">
+                        <CheckSquare className="w-5 h-5 text-[#30EEE2]" />
                     </div>
-
-                    {/* Filtros Rápidos */}
-                    <div className="flex items-center gap-2">
-                        <select
-                            value={selectedProject}
-                            onChange={(e) => handleFilterChange(e.target.value, selectedUser)}
-                            className="input-xamanen text-xs py-1.5 bg-[#101522]"
-                        >
-                            <option value="">Todos los Proyectos</option>
-                            {projects.map((p) => (
-                                <option key={p.id} value={p.id}>
-                                    {p.code} - {p.name}
-                                </option>
-                            ))}
-                        </select>
-
-                        <select
-                            value={selectedUser}
-                            onChange={(e) => handleFilterChange(selectedProject, e.target.value)}
-                            className="input-xamanen text-xs py-1.5 bg-[#101522]"
-                        >
-                            <option value="">Todos los Asignados</option>
-                            {technicalUsers.map((u) => (
-                                <option key={u.id} value={u.id}>
-                                    {u.name}
-                                </option>
-                            ))}
-                        </select>
+                    <div>
+                        <h2 className="text-xl font-heading font-bold text-white leading-tight">
+                            Tablero Kanban de Tickets & Sprints
+                        </h2>
+                        <p className="text-xs text-white/50">
+                            Asignación multi-rol (`Dev`, `QA`, `UI/UX`, `Validador`) y avance operativo
+                        </p>
                     </div>
                 </div>
             }
         >
             <Head title="Tablero Kanban de Tickets" />
+
+            {/* Barra de Filtros del Tablero (En el Cuerpo) */}
+            <div className="glass-panel p-4 mb-6 flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <h3 className="text-sm font-heading font-bold text-white">Filtros Operativos</h3>
+                    <p className="text-xs text-white/50">Filtra tarjetas por obra o especialista técnico</p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                    <select
+                        value={selectedProject}
+                        onChange={(e) => handleFilterChange(e.target.value, selectedUser)}
+                        className="input-xamanen text-xs py-1.5 bg-[#101522]"
+                    >
+                        <option value="">Todos los Proyectos</option>
+                        {projects.map((p) => (
+                            <option key={p.id} value={p.id}>
+                                {p.code} - {p.name}
+                            </option>
+                        ))}
+                    </select>
+
+                    <select
+                        value={selectedUser}
+                        onChange={(e) => handleFilterChange(selectedProject, e.target.value)}
+                        className="input-xamanen text-xs py-1.5 bg-[#101522]"
+                    >
+                        <option value="">Todos los Asignados</option>
+                        {technicalUsers.map((u) => (
+                            <option key={u.id} value={u.id}>
+                                {u.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            </div>
 
             {/* Columnas Kanban */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-start">

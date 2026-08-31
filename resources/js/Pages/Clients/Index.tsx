@@ -74,32 +74,37 @@ export default function Index({ clients, filters, metrics }: IndexProps) {
     return (
         <AppLayout
             header={
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-[#30EEE2]/10 border border-[#30EEE2]/20">
-                            <Users className="w-5 h-5 text-[#30EEE2]" />
-                        </div>
-                        <div>
-                            <h2 className="text-xl font-heading font-bold text-white leading-tight">
-                                Gestión de Clientes (Mini-CRM)
-                            </h2>
-                            <p className="text-xs text-white/50">
-                                Segmentación por industria y seguimiento comercial 360°
-                            </p>
-                        </div>
+                <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-[#30EEE2]/10 border border-[#30EEE2]/20">
+                        <Users className="w-5 h-5 text-[#30EEE2]" />
                     </div>
-
-                    <Link
-                        href={route('clients.create')}
-                        className="btn-xamanen-primary text-xs"
-                    >
-                        <Plus className="w-4 h-4" />
-                        Registrar Cliente
-                    </Link>
+                    <div>
+                        <h2 className="text-xl font-heading font-bold text-white leading-tight">
+                            Gestión de Clientes (Mini-CRM)
+                        </h2>
+                        <p className="text-xs text-white/50">
+                            Segmentación por industria y seguimiento comercial 360°
+                        </p>
+                    </div>
                 </div>
             }
         >
             <Head title="Clientes - Mini-CRM" />
+
+            {/* Barra de Acciones del Cuerpo */}
+            <div className="flex items-center justify-between gap-4 mb-6">
+                <div>
+                    <h3 className="text-sm font-heading font-bold text-white">Directorio de Empresas</h3>
+                    <p className="text-xs text-white/50">Cartera activa de clientes categorizada por industria</p>
+                </div>
+                <Link
+                    href={route('clients.create')}
+                    className="btn-xamanen-primary text-xs shrink-0 shadow-lg"
+                >
+                    <Plus className="w-4 h-4" />
+                    Registrar Nuevo Cliente
+                </Link>
+            </div>
 
             {/* KPIs de Cartera por Industria */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
