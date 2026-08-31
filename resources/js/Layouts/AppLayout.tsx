@@ -244,23 +244,28 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
                     {visibleNavItems.map((item, index) => {
                         const Icon = item.icon;
                         
-                        // Detección reactiva de ruta activa
+                        // Detección unívoca de ruta activa
                         let isActive = false;
                         if (item.routePattern) {
                             try {
-                                if (typeof route().current === 'function' && route().current(item.routePattern)) {
-                                    isActive = true;
+                                if (typeof route().current === 'function') {
+                                    if (item.routePattern === 'quotes.index') {
+                                        isActive = route().current('quotes.index') || route().current('quotes.show');
+                                    } else {
+                                        isActive = route().current(item.routePattern);
+                                    }
                                 }
                             } catch (e) {
                                 // fallback
                             }
                         }
-                        if (!isActive && item.href && item.href !== '#') {
+                        
+                        if (!isActive && !item.routePattern && item.href && item.href !== '#') {
                             try {
                                 const itemPath = new URL(item.href, window.location.origin).pathname;
                                 if (itemPath === '/' && url === '/') {
                                     isActive = true;
-                                } else if (itemPath !== '/' && url.startsWith(itemPath)) {
+                                } else if (itemPath !== '/' && url === itemPath) {
                                     isActive = true;
                                 }
                             } catch (e) {

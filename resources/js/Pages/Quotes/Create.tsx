@@ -194,27 +194,18 @@ export default function Create({
     return (
         <AppLayout
             header={
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-[#30EEE2]/10 border border-[#30EEE2]/20">
-                            <Calculator className="w-5 h-5 text-[#30EEE2]" />
-                        </div>
-                        <div>
-                            <h2 className="text-xl font-heading font-bold text-white leading-tight">
-                                Cotizador CPQ Interactivo
-                            </h2>
-                            <p className="text-xs text-white/50">
-                                Estimación de esfuerzo, costos fijos y cálculo de entrega en días hábiles
-                            </p>
-                        </div>
+                <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-[#30EEE2]/10 border border-[#30EEE2]/20">
+                        <Calculator className="w-5 h-5 text-[#30EEE2]" />
                     </div>
-
-                    <Link
-                        href={route('quotes.index')}
-                        className="btn-xamanen-secondary text-xs"
-                    >
-                        Ver Historial de Presupuestos
-                    </Link>
+                    <div>
+                        <h2 className="text-xl font-heading font-bold text-white leading-tight">
+                            Cotizador CPQ Interactivo
+                        </h2>
+                        <p className="text-xs text-white/50">
+                            Estimación de esfuerzo, costos fijos y cálculo de entrega en días hábiles
+                        </p>
+                    </div>
                 </div>
             }
         >
