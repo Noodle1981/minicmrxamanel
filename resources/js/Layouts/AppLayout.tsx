@@ -184,50 +184,6 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
                     </button>
                 </div>
 
-                {/* Switcher Multi-Rol (Si el usuario tiene varios roles) */}
-                <div className="p-4 border-b border-white/10 bg-white/[0.02]">
-                    {userRoles.length > 1 ? (
-                        <div className="relative">
-                            <button
-                                type="button"
-                                onClick={() => setRoleDropdownOpen(!roleDropdownOpen)}
-                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium border ${roleLabels[activeRole]?.color} transition-all`}
-                            >
-                                <span className="flex items-center gap-2">
-                                    <Briefcase className="w-3.5 h-3.5" />
-                                    {roleLabels[activeRole]?.label}
-                                </span>
-                                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${roleDropdownOpen ? 'rotate-180' : ''}`} />
-                            </button>
-
-                            {roleDropdownOpen && (
-                                <div className="absolute top-full left-0 right-0 mt-1.5 py-1.5 bg-[#161D2E] border border-white/10 rounded-lg shadow-2xl z-30 backdrop-blur-md">
-                                    {userRoles.map((r) => (
-                                        <button
-                                            key={r}
-                                            type="button"
-                                            onClick={() => {
-                                                setActiveRole(r);
-                                                setRoleDropdownOpen(false);
-                                            }}
-                                            className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-white/5 transition-colors ${
-                                                activeRole === r ? 'text-[#30EEE2] font-semibold' : 'text-white/80'
-                                            }`}
-                                        >
-                                            <span>{roleLabels[r]?.label || r}</span>
-                                            {activeRole === r && <CheckCircle2 className="w-3.5 h-3.5 text-[#30EEE2]" />}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <div className={`px-3 py-2 rounded-lg text-xs font-medium border ${roleLabels[activeRole]?.color}`}>
-                            {roleLabels[activeRole]?.label}
-                        </div>
-                    )}
-                </div>
-
                 {/* Menú de Navegación */}
                 <nav className="flex-1 px-4 py-4 space-y-1.5 overflow-y-auto custom-scrollbar">
                     <div className="text-[11px] font-semibold text-white/40 uppercase tracking-wider px-3 mb-2">
@@ -339,12 +295,6 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        {/* Indicador de Entorno / Preset */}
-                        <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-xs text-white/70">
-                            <span className="w-2 h-2 rounded-full bg-[#30EEE2] animate-pulse"></span>
-                            <span>Sistema Operativo Xamanen</span>
-                        </div>
-
                         {/* Menú de Perfil */}
                         <div className="relative">
                             <button
