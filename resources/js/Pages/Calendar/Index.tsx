@@ -1,24 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import {
     Calendar as CalendarIcon,
     ChevronLeft,
     ChevronRight,
-    Clock,
+    Search,
+    Filter,
+    RotateCcw,
     FolderKanban,
-    AlertCircle,
+    UserCheck,
+    Clock,
     CheckCircle2,
-    Sparkles,
-    Briefcase,
+    AlertCircle,
     Building2,
-    Layers,
 } from 'lucide-react';
 
 interface DayData {
     date: string;
     day_number: number;
     day_name: string;
+    is_current_month: boolean;
     is_weekend: boolean;
     is_today: boolean;
     daily_hours: number;
@@ -41,10 +43,19 @@ interface DayData {
 }
 
 interface IndexProps {
-    month: string; // YYYY-MM
+    year: number;
+    month: number;
     monthName: string;
     daysInMonth: DayData[];
-    projects: any[];
+    allProjects: { id: number; name: string; code: string }[];
+    sellers: { id: number; name: string; email: string }[];
+    filters: {
+        year: number;
+        month: number;
+        project_id: number | null;
+        seller_id: number | null;
+        search: string;
+    };
     summary: {
         total_business_days: number;
         avg_daily_load: number;
@@ -52,19 +63,102 @@ interface IndexProps {
     };
 }
 
-export default function Index({ month, monthName, daysInMonth, projects, summary }: IndexProps) {
+const MONTHS_ES = [
+    { value: 1, label: 'Enero' },
+    { value: 2, label: 'Febrero' },
+    { value: 3, label: 'Marzo' },
+    { value: 4, label: 'Abril' },
+    { value: 5, label: 'Mayo' },
+    { value: 6, label: 'Junio' },
+    { value: 7, label: 'Julio' },
+    { value: 8, label: 'Agosto' },
+    { value: 9, label: 'Septiembre' },
+    { value: 10, label: 'Octubre' },
+    { value: 11, label: 'Noviembre' },
+    { value: 12, label: 'Diciembre' },
+];
+
+const WEEKDAYS_ES = [
+    'Lunes',
+    'Martes',
+    'Miércoles',
+    'Jueves',
+    'Viernes',
+    'Sábado',
+    'Domingo',
+];
+
+const YEARS = [2024, 2025, 2026, 2027, 2028];
+
+export default function Index({
+    year,
+    month,
+    monthName,
+    daysInMonth,
+    allProjects,
+    sellers,
+    filters,
+    summary,
+}: IndexProps) {
+    const [selectedYear, setSelectedYear] = useState<number>(filters.year);
+    const [selectedMonth, setSelectedMonth] = useState<number>(filters.month);
+    const [selectedProject, setSelectedProject] = useState<number | ''>(filters.project_id || '');
+    const [selectedSeller, setSelectedSeller] = useState<number | ''>(filters.seller_id || '');
+    const [search, setSearch] = useState<string>(filters.search || '');
+
+    const applyFilters = (newParams: Partial<typeof filters>) => {
+        router.get(
+            route('calendar.index'),
+            {
+                year: newParams.year ?? selectedYear,
+                month: newParams.month ?? selectedMonth,
+                project_id: newParams.project_id !== undefined ? newParams.project_id : selectedProject,
+                seller_id: newParams.seller_id !== undefined ? newParams.seller_id : selectedSeller,
+                search: newParams.search !== undefined ? newParams.search : search,
+            },
+            { preserveState: true }
+        );
+    };
+
     const handlePrevMonth = () => {
-        const d = new Date(month + '-01');
-        d.setMonth(d.getMonth() - 1);
-        const newMonth = d.toISOString().slice(0, 7);
-        router.get(route('calendar.index'), { month: newMonth }, { preserveState: true });
+        let newMonth = selectedMonth - 1;
+        let newYear = selectedYear;
+        if (newMonth < 1) {
+            newMonth = 12;
+            newYear -= 1;
+        }
+        setSelectedMonth(newMonth);
+        setSelectedYear(newYear);
+        applyFilters({ year: newYear, month: newMonth });
     };
 
     const handleNextMonth = () => {
-        const d = new Date(month + '-01');
-        d.setMonth(d.getMonth() + 1);
-        const newMonth = d.toISOString().slice(0, 7);
-        router.get(route('calendar.index'), { month: newMonth }, { preserveState: true });
+        let newMonth = selectedMonth + 1;
+        let newYear = selectedYear;
+        if (newMonth > 12) {
+            newMonth = 1;
+            newYear += 1;
+        }
+        setSelectedMonth(newMonth);
+        setSelectedYear(newYear);
+        applyFilters({ year: newYear, month: newMonth });
+    };
+
+    const handleResetFilters = () => {
+        const now = new Date();
+        const curYear = now.getFullYear();
+        const curMonth = now.getMonth() + 1;
+        setSelectedYear(curYear);
+        setSelectedMonth(curMonth);
+        setSelectedProject('');
+        setSelectedSeller('');
+        setSearch('');
+        router.get(route('calendar.index'), { year: curYear, month: curMonth }, { preserveState: true });
+    };
+
+    const handleSearchSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        applyFilters({ search });
     };
 
     const loadColors: Record<string, { bg: string; border: string; text: string; label: string }> = {
@@ -93,36 +187,162 @@ export default function Index({ month, monthName, daysInMonth, projects, summary
                 </div>
             }
         >
-            <Head title="Calendario & Disponibilidad" />
+            <Head title={`Calendario - ${monthName}`} />
 
-            {/* Barra de Control de Período / Mes (En el Cuerpo) */}
-            <div className="glass-panel p-4 mb-6 flex flex-wrap items-center justify-between gap-4">
-                <div>
-                    <h3 className="text-sm font-heading font-bold text-white">Planificación Mensual</h3>
-                    <p className="text-xs text-white/50">Cálculo de horas comprometidas y capacidad del equipo técnico</p>
-                </div>
+            {/* Barra de Filtros y Período (En el Cuerpo) */}
+            <div className="glass-panel p-4 mb-6 space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-4 pb-3 border-b border-white/10">
+                    {/* Controles de Navegación Rápida */}
+                    <div className="flex items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={handlePrevMonth}
+                            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 transition-colors"
+                            title="Mes Anterior"
+                        >
+                            <ChevronLeft className="w-4 h-4" />
+                        </button>
 
-                <div className="flex items-center gap-2">
+                        <h3 className="text-base font-heading font-bold text-white px-2 capitalize">
+                            {monthName}
+                        </h3>
+
+                        <button
+                            type="button"
+                            onClick={handleNextMonth}
+                            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 transition-colors"
+                            title="Mes Siguiente"
+                        >
+                            <ChevronRight className="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    {/* Botón de Restablecer */}
                     <button
                         type="button"
-                        onClick={handlePrevMonth}
-                        className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 transition-colors"
-                        title="Mes Anterior"
+                        onClick={handleResetFilters}
+                        className="btn-xamanen-secondary text-xs px-3 py-1.5 flex items-center gap-1.5"
                     >
-                        <ChevronLeft className="w-4 h-4" />
-                    </button>
-                    <span className="text-sm font-heading font-bold text-white capitalize px-3">
-                        {monthName}
-                    </span>
-                    <button
-                        type="button"
-                        onClick={handleNextMonth}
-                        className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 transition-colors"
-                        title="Mes Siguiente"
-                    >
-                        <ChevronRight className="w-4 h-4" />
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        Mes Actual / Limpiar
                     </button>
                 </div>
+
+                {/* Filtros Detallados (Mes, Año, Proyecto, Vendedor, Búsqueda) */}
+                <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
+                    {/* Selector de Mes */}
+                    <div className="lg:col-span-2">
+                        <label className="block text-[10px] font-semibold text-white/50 uppercase tracking-wider mb-1">
+                            Mes
+                        </label>
+                        <select
+                            value={selectedMonth}
+                            onChange={(e) => {
+                                const m = Number(e.target.value);
+                                setSelectedMonth(m);
+                                applyFilters({ month: m });
+                            }}
+                            className="w-full input-xamanen text-xs bg-[#101522]"
+                        >
+                            {MONTHS_ES.map((m) => (
+                                <option key={m.value} value={m.value}>
+                                    {m.label}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Selector de Año */}
+                    <div className="lg:col-span-2">
+                        <label className="block text-[10px] font-semibold text-white/50 uppercase tracking-wider mb-1">
+                            Año
+                        </label>
+                        <select
+                            value={selectedYear}
+                            onChange={(e) => {
+                                const y = Number(e.target.value);
+                                setSelectedYear(y);
+                                applyFilters({ year: y });
+                            }}
+                            className="w-full input-xamanen text-xs bg-[#101522]"
+                        >
+                            {YEARS.map((y) => (
+                                <option key={y} value={y}>
+                                    {y}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Filtro por Proyecto */}
+                    <div className="lg:col-span-3">
+                        <label className="block text-[10px] font-semibold text-white/50 uppercase tracking-wider mb-1">
+                            Proyecto / Obra
+                        </label>
+                        <select
+                            value={selectedProject}
+                            onChange={(e) => {
+                                const pid = e.target.value ? Number(e.target.value) : null;
+                                setSelectedProject(e.target.value ? Number(e.target.value) : '');
+                                applyFilters({ project_id: pid });
+                            }}
+                            className="w-full input-xamanen text-xs bg-[#101522]"
+                        >
+                            <option value="">Todos los Proyectos</option>
+                            {allProjects.map((p) => (
+                                <option key={p.id} value={p.id}>
+                                    {p.code} - {p.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Filtro por Vendedor */}
+                    <div className="lg:col-span-2">
+                        <label className="block text-[10px] font-semibold text-white/50 uppercase tracking-wider mb-1">
+                            Vendedor / Lead
+                        </label>
+                        <select
+                            value={selectedSeller}
+                            onChange={(e) => {
+                                const sid = e.target.value ? Number(e.target.value) : null;
+                                setSelectedSeller(e.target.value ? Number(e.target.value) : '');
+                                applyFilters({ seller_id: sid });
+                            }}
+                            className="w-full input-xamanen text-xs bg-[#101522]"
+                        >
+                            <option value="">Todos los Vendedores</option>
+                            {sellers.map((s) => (
+                                <option key={s.id} value={s.id}>
+                                    {s.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Búsqueda por Nombre / Cliente */}
+                    <div className="lg:col-span-3">
+                        <label className="block text-[10px] font-semibold text-white/50 uppercase tracking-wider mb-1">
+                            Buscar Proyecto o Cliente
+                        </label>
+                        <div className="relative">
+                            <input
+                                type="text"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                placeholder="Nombre, código o cliente..."
+                                className="w-full input-xamanen text-xs pr-8"
+                            />
+                            <button
+                                type="submit"
+                                className="absolute right-2 top-2 text-white/40 hover:text-white"
+                                title="Buscar"
+                            >
+                                <Search className="w-3.5 h-3.5" />
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
 
             {/* Resumen de Capacidad del Mes */}
@@ -134,7 +354,7 @@ export default function Index({ month, monthName, daysInMonth, projects, summary
                     <p className="text-2xl font-heading font-bold text-white">
                         {summary.total_business_days} días
                     </p>
-                    <span className="text-[11px] text-white/40">Excluye sábados y domingos</span>
+                    <span className="text-[11px] text-white/40">Lunes a Viernes laborables</span>
                 </div>
 
                 <div className="glass-panel p-5">
@@ -144,7 +364,7 @@ export default function Index({ month, monthName, daysInMonth, projects, summary
                     <p className="text-2xl font-heading font-bold text-[#30EEE2]">
                         {summary.avg_daily_load} hs / día
                     </p>
-                    <span className="text-[11px] text-white/40">Sobre capacidad base de 8 hs/día</span>
+                    <span className="text-[11px] text-white/40">Capacidad estándar: 8.0 hs/día</span>
                 </div>
 
                 <div className="glass-panel p-5">
@@ -174,7 +394,7 @@ export default function Index({ month, monthName, daysInMonth, projects, summary
                     </span>
                     <span className="flex items-center gap-1.5 text-emerald-300">
                         <span className="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-                        Óptima (6h-8h)
+                        Óptima (6h-8.5h)
                     </span>
                     <span className="flex items-center gap-1.5 text-amber-300">
                         <span className="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
@@ -187,16 +407,30 @@ export default function Index({ month, monthName, daysInMonth, projects, summary
                 </div>
             </div>
 
+            {/* Encabezados de Días de la Semana (Español) */}
+            <div className="grid grid-cols-7 gap-3 mb-2 text-center">
+                {WEEKDAYS_ES.map((dayName, idx) => (
+                    <div
+                        key={dayName}
+                        className={`p-2 rounded-lg text-xs font-bold uppercase tracking-wider ${
+                            idx >= 5 ? 'text-white/30 bg-white/[0.01]' : 'text-white/80 bg-white/[0.03]'
+                        }`}
+                    >
+                        {dayName}
+                    </div>
+                ))}
+            </div>
+
             {/* Matriz de Días del Mes */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
                 {daysInMonth.map((day) => {
                     const load = loadColors[day.load_level] || loadColors.free;
 
                     return (
                         <div
                             key={day.date}
-                            className={`glass-panel p-3.5 min-h-[140px] flex flex-col justify-between transition-all ${
-                                load.bg
+                            className={`glass-panel p-3 min-h-[145px] flex flex-col justify-between transition-all ${
+                                !day.is_current_month ? 'opacity-30 bg-black/20' : load.bg
                             } ${load.border} ${
                                 day.is_today ? 'ring-2 ring-[#30EEE2] shadow-lg shadow-[#30EEE2]/20' : ''
                             }`}
@@ -204,7 +438,11 @@ export default function Index({ month, monthName, daysInMonth, projects, summary
                             {/* Cabecera del Día */}
                             <div className="flex items-center justify-between pb-1.5 border-b border-white/5">
                                 <div className="flex items-baseline gap-1">
-                                    <span className="font-heading font-bold text-base text-white">
+                                    <span
+                                        className={`font-heading font-bold text-sm ${
+                                            day.is_current_month ? 'text-white' : 'text-white/40'
+                                        }`}
+                                    >
                                         {day.day_number}
                                     </span>
                                     <span className="text-[10px] text-white/40 uppercase font-semibold">
@@ -212,7 +450,7 @@ export default function Index({ month, monthName, daysInMonth, projects, summary
                                     </span>
                                 </div>
 
-                                {!day.is_weekend && day.daily_hours > 0 && (
+                                {day.is_current_month && !day.is_weekend && day.daily_hours > 0 && (
                                     <span
                                         className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded border ${load.border} ${load.text}`}
                                     >
@@ -235,7 +473,7 @@ export default function Index({ month, monthName, daysInMonth, projects, summary
                                                 ? 'bg-rose-500/20 text-rose-200 border border-rose-500/40 font-bold'
                                                 : 'bg-white/[0.04] text-white/80 border border-white/5'
                                         }`}
-                                        title={`${prj.code}: ${prj.name} (${prj.hours}h asignadas hoy)`}
+                                        title={`${prj.code}: ${prj.name} - Cliente: ${prj.client} (${prj.hours}h hoy)`}
                                     >
                                         {prj.is_due_date && <span className="text-rose-400 mr-1 font-bold">🏁 ENTREGA:</span>}
                                         <span className="font-mono text-[#30EEE2] mr-1">{prj.code}</span>
@@ -256,7 +494,13 @@ export default function Index({ month, monthName, daysInMonth, projects, summary
 
                             {/* Footer del Día */}
                             <div className="text-[9px] text-white/30 pt-1 border-t border-white/5 flex items-center justify-between">
-                                <span>{day.is_weekend ? 'No laborable' : `${day.projects.length} obras`}</span>
+                                <span>
+                                    {day.is_weekend
+                                        ? 'No laborable'
+                                        : day.projects.length > 0
+                                        ? `${day.projects.length} ${day.projects.length === 1 ? 'obra' : 'obras'}`
+                                        : 'Libre'}
+                                </span>
                                 {day.is_today && <span className="text-[#30EEE2] font-bold">HOY</span>}
                             </div>
                         </div>
