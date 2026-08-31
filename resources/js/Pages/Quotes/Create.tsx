@@ -444,7 +444,7 @@ export default function Create({
                                         {category}
                                     </h4>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <div className="grid grid-cols-1 gap-2.5">
                                         {items.map((feature) => {
                                             const isSelected = data.selected_feature_ids.includes(feature.id);
                                             const totalFeatHours =
@@ -456,53 +456,54 @@ export default function Create({
                                                 <div
                                                     key={feature.id}
                                                     onClick={() => toggleFeature(feature.id)}
-                                                    className={`p-4 rounded-xl border cursor-pointer transition-all duration-200 flex flex-col justify-between ${
+                                                    className={`p-3.5 rounded-xl border cursor-pointer transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                                                         isSelected
                                                             ? 'bg-[#30EEE2]/[0.08] border-[#30EEE2] shadow-lg shadow-[#30EEE2]/10'
                                                             : 'bg-white/[0.02] border-white/10 hover:border-white/20 hover:bg-white/[0.04]'
                                                     }`}
                                                 >
-                                                    <div>
-                                                        <div className="flex items-start justify-between gap-2 mb-1.5">
-                                                            <span className="text-xs font-heading font-bold text-white leading-tight">
-                                                                {feature.name}
-                                                            </span>
-                                                            <div
-                                                                className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 transition-colors ${
-                                                                    isSelected
-                                                                        ? 'bg-[#30EEE2] text-[#0A0C10]'
-                                                                        : 'border border-white/30 bg-white/5'
-                                                                }`}
-                                                            >
-                                                                {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
-                                                            </div>
+                                                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                                                        <div
+                                                            className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
+                                                                isSelected
+                                                                    ? 'bg-[#30EEE2] text-[#0A0C10]'
+                                                                    : 'border border-white/30 bg-white/5'
+                                                            }`}
+                                                        >
+                                                            {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
                                                         </div>
 
-                                                        {feature.description && (
-                                                            <p className="text-[11px] text-white/60 line-clamp-2 mb-3">
-                                                                {feature.description}
-                                                            </p>
-                                                        )}
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex flex-wrap items-center gap-2">
+                                                                <span className="text-xs font-heading font-bold text-white leading-tight">
+                                                                    {feature.name}
+                                                                </span>
+                                                                {Number(feature.cost_monthly_infra) > 0 && (
+                                                                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 flex items-center gap-1 font-mono">
+                                                                        <Server className="w-2.5 h-2.5" />
+                                                                        +${feature.cost_monthly_infra}/mes
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            {feature.description && (
+                                                                <p className="text-[11px] text-white/60 mt-1 leading-relaxed">
+                                                                    {feature.description}
+                                                                </p>
+                                                            )}
+                                                        </div>
                                                     </div>
 
-                                                    {/* Desglose de Horas & Costos de la Feature */}
-                                                    <div className="pt-2.5 border-t border-white/10 flex items-center justify-between text-[11px]">
-                                                        <div className="flex items-center gap-1.5 text-white/70">
-                                                            <Clock className="w-3 h-3 text-[#30EEE2]" />
-                                                            <span className="font-semibold text-white">
-                                                                {totalFeatHours}h
-                                                            </span>
-                                                            <span className="text-white/40 text-[10px]">
-                                                                ({feature.hours_dev}h Dev · {feature.hours_integration}h Int · {feature.hours_testing_qa}h QA)
-                                                            </span>
-                                                        </div>
-
-                                                        {Number(feature.cost_monthly_infra) > 0 && (
-                                                            <div className="text-[10px] text-purple-300 flex items-center gap-1">
-                                                                <Server className="w-3 h-3" />
-                                                                +${feature.cost_monthly_infra}/mes
+                                                    {/* Desglose de Horas */}
+                                                    <div className="sm:shrink-0 flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-white/10 text-[11px]">
+                                                        <div className="text-left sm:text-right">
+                                                            <div className="flex items-center gap-1 font-heading font-bold text-white sm:justify-end">
+                                                                <Clock className="w-3 h-3 text-[#30EEE2]" />
+                                                                <span>{totalFeatHours} hs</span>
                                                             </div>
-                                                        )}
+                                                            <div className="text-[10px] text-white/40 font-mono mt-0.5">
+                                                                {feature.hours_dev}d Dev · {feature.hours_integration}i Int · {feature.hours_testing_qa}q QA
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             );
