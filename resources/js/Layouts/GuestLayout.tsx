@@ -10,18 +10,18 @@ export default function Guest({ children }: PropsWithChildren) {
 
             {/* Logo de Grupo Xamanen */}
             <div className="mb-6 text-center z-10">
-                <Link href="/" className="inline-flex items-center gap-3 group">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#30EEE2] via-[#3C84CE] to-[#65005E] p-[1.5px] shadow-xl shadow-[#30EEE2]/20">
-                        <div className="w-full h-full bg-[#0A0C10] rounded-[14px] flex items-center justify-center">
-                            <Sparkles className="w-6 h-6 text-[#30EEE2] group-hover:scale-110 transition-transform" />
-                        </div>
-                    </div>
-                    <div className="text-left">
+                <Link href="/" className="inline-flex flex-col items-center gap-3 group">
+                    <img
+                        src="/images/logo.png"
+                        alt="Grupo Xamanen"
+                        className="h-16 sm:h-20 w-auto object-contain drop-shadow-[0_0_25px_rgba(48,238,226,0.3)] group-hover:scale-105 transition-transform"
+                    />
+                    <div className="text-center">
                         <span className="font-heading font-extrabold text-2xl text-white tracking-wide block">
                             Grupo <span className="text-[#30EEE2]">Xamanen</span>
                         </span>
                         <span className="text-xs text-white/50 tracking-wider uppercase block font-medium">
-                            CPQ & Plataforma de Gestión
+                            CPQ & Plataforma Operativa
                         </span>
                     </div>
                 </Link>

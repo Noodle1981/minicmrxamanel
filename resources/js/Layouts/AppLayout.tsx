@@ -153,19 +153,19 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
                 }`}
             >
                 {/* Logo & Marca */}
-                <div className="h-20 shrink-0 flex items-center justify-between px-6 border-b border-white/10">
+                <div className="h-20 shrink-0 flex items-center justify-between px-5 border-b border-white/10">
                     <Link href={route('dashboard')} className="flex items-center gap-3 group">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#30EEE2] via-[#3C84CE] to-[#65005E] p-[1.5px] shadow-lg shadow-[#30EEE2]/20">
-                            <div className="w-full h-full bg-[#0A0C10] rounded-[10px] flex items-center justify-center">
-                                <Sparkles className="w-5 h-5 text-[#30EEE2] group-hover:scale-110 transition-transform" />
-                            </div>
-                        </div>
+                        <img
+                            src="/images/logo.png"
+                            alt="Grupo Xamanen"
+                            className="h-10 w-auto object-contain drop-shadow-[0_0_15px_rgba(48,238,226,0.3)] group-hover:scale-105 transition-transform"
+                        />
                         <div>
-                            <span className="font-heading font-bold text-lg text-white tracking-wide block">
+                            <span className="font-heading font-bold text-base text-white tracking-wide block leading-tight">
                                 Grupo <span className="text-[#30EEE2]">Xamanen</span>
                             </span>
-                            <span className="text-[11px] text-white/50 tracking-wider uppercase block">
-                                CPQ & Proyectos
+                            <span className="text-[10px] text-white/50 tracking-wider uppercase block font-medium">
+                                CPQ & Operaciones
                             </span>
                         </div>
                     </Link>
