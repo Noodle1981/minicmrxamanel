@@ -19,6 +19,10 @@ import {
     Sparkles,
     UserCheck,
     Lock,
+    HardHat,
+    Leaf,
+    ShoppingCart,
+    Factory,
 } from 'lucide-react';
 
 interface PaginatedQuotes {
@@ -100,12 +104,13 @@ export default function Index({ quotes, sellers, filters, clients, metrics, curr
         expired: { label: 'Vencido', class: 'bg-gray-500/20 text-gray-400 border-gray-500/40', icon: Clock },
     };
 
-    const industryBadges: Record<string, { label: string; color: string }> = {
-        mineria: { label: 'Minería', color: 'text-amber-400 bg-amber-500/10 border-amber-500/30' },
-        medio_ambiente: { label: 'Medio Ambiente', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' },
-        comercio: { label: 'Comercio', color: 'text-blue-400 bg-blue-500/10 border-blue-500/30' },
-        servicios: { label: 'Servicios', color: 'text-purple-400 bg-purple-500/10 border-purple-500/30' },
-        otro: { label: 'General', color: 'text-white/60 bg-white/5 border-white/10' },
+    const industryBadges: Record<string, { label: string; color: string; icon: React.ComponentType<{ className?: string }> }> = {
+        mineria: { label: 'Minería', color: 'text-amber-400 bg-amber-500/10 border-amber-500/30', icon: HardHat },
+        medio_ambiente: { label: 'Medio Ambiente', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30', icon: Leaf },
+        comercio: { label: 'Comercio', color: 'text-blue-400 bg-blue-500/10 border-blue-500/30', icon: ShoppingCart },
+        industria: { label: 'Industria', color: 'text-purple-400 bg-purple-500/10 border-purple-500/30', icon: Factory },
+        servicios: { label: 'Servicios', color: 'text-teal-400 bg-teal-500/10 border-teal-500/30', icon: Briefcase },
+        otro: { label: 'General', color: 'text-white/60 bg-white/5 border-white/10', icon: Building2 },
     };
 
     return (
@@ -328,11 +333,17 @@ export default function Index({ quotes, sellers, filters, clients, metrics, curr
                                                     {quote.client?.company_name || 'Sin cliente'}
                                                 </div>
                                                 <div className="flex items-center gap-1.5 mt-0.5">
-                                                    <span
-                                                        className={`text-[9px] px-1.5 py-0.5 rounded border ${industryInfo.color} font-medium`}
-                                                    >
-                                                        {industryInfo.label}
-                                                    </span>
+                                                    {(() => {
+                                                        const IndustryIcon = industryInfo.icon || Building2;
+                                                        return (
+                                                            <span
+                                                                className={`text-[9px] px-1.5 py-0.5 rounded border ${industryInfo.color} font-medium inline-flex items-center gap-1`}
+                                                            >
+                                                                <IndustryIcon className="w-2.5 h-2.5" />
+                                                                {industryInfo.label}
+                                                            </span>
+                                                        );
+                                                    })()}
                                                     <span className="text-[10px] text-white/40">
                                                         {quote.client?.contact_name}
                                                     </span>

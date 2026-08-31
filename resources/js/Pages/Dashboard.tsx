@@ -5,6 +5,8 @@ import {
     HardHat,
     Leaf,
     ShoppingCart,
+    Factory,
+    Briefcase,
     Users,
     FolderKanban,
     TrendingUp,
@@ -59,67 +61,117 @@ export default function Dashboard() {
                     <h3 className="text-base font-heading font-bold text-white">
                         Plantillas & Presets Estratégicos
                     </h3>
-                    <span className="text-xs text-white/50">Catálogo precargado (Seeders)</span>
+                    <span className="text-xs text-white/50">5 Modelos precargados listos para cotizar</span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                     {/* Tarjeta Minería */}
                     <Link
                         href={route('quotes.create', { preset: 'mineria' })}
-                        className="glass-panel p-6 relative overflow-hidden group hover:border-[#30EEE2]/40 transition-all block"
+                        className="glass-panel p-5 relative overflow-hidden group hover:border-[#30EEE2]/40 transition-all flex flex-col justify-between"
                     >
-                        <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mb-4 text-amber-400">
-                            <HardHat className="w-6 h-6" />
+                        <div>
+                            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mb-3 text-amber-400">
+                                <HardHat className="w-5 h-5" />
+                            </div>
+                            <h4 className="text-sm font-heading font-bold text-white mb-1">
+                                Minería & HSE
+                            </h4>
+                            <p className="text-[11px] text-white/60 mb-3 leading-relaxed">
+                                Telemetría IoT, mapas satelitales GIS, modo offline y control de cuadrillas.
+                            </p>
                         </div>
-                        <h4 className="text-lg font-heading font-bold text-white mb-1">
-                            Minería & Seguridad (HSE)
-                        </h4>
-                        <p className="text-xs text-white/60 mb-4 leading-relaxed">
-                            Telemetría de sensores, mapas satelitales GIS, modo offline para terreno y control de cuadrillas/EPP.
-                        </p>
-                        <div className="flex items-center justify-between text-xs text-[#30EEE2] font-semibold">
-                            <span>Cotizar con este Preset</span>
-                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        <div className="flex items-center justify-between text-xs text-[#30EEE2] font-semibold pt-2 border-t border-white/5">
+                            <span>Cotizar</span>
+                            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                         </div>
                     </Link>
 
                     {/* Tarjeta Medio Ambiente */}
                     <Link
                         href={route('quotes.create', { preset: 'medio_ambiente' })}
-                        className="glass-panel p-6 relative overflow-hidden group hover:border-[#30EEE2]/40 transition-all block"
+                        className="glass-panel p-5 relative overflow-hidden group hover:border-[#30EEE2]/40 transition-all flex flex-col justify-between"
                     >
-                        <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mb-4 text-emerald-400">
-                            <Leaf className="w-6 h-6" />
+                        <div>
+                            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mb-3 text-emerald-400">
+                                <Leaf className="w-5 h-5" />
+                            </div>
+                            <h4 className="text-sm font-heading font-bold text-white mb-1">
+                                Medio Ambiente
+                            </h4>
+                            <p className="text-[11px] text-white/60 mb-3 leading-relaxed">
+                                Monitoreo ambiental, matriz legal y cálculo de huella de carbono.
+                            </p>
                         </div>
-                        <h4 className="text-lg font-heading font-bold text-white mb-1">
-                            Medio Ambiente & Sustentabilidad
-                        </h4>
-                        <p className="text-xs text-white/60 mb-4 leading-relaxed">
-                            Monitoreo de aire/agua/suelo, matriz de cumplimiento legal ambiental y reportes de huella de carbono.
-                        </p>
-                        <div className="flex items-center justify-between text-xs text-[#30EEE2] font-semibold">
-                            <span>Cotizar con este Preset</span>
-                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        <div className="flex items-center justify-between text-xs text-[#30EEE2] font-semibold pt-2 border-t border-white/5">
+                            <span>Cotizar</span>
+                            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                         </div>
                     </Link>
 
                     {/* Tarjeta Comercio */}
                     <Link
                         href={route('quotes.create', { preset: 'comercio' })}
-                        className="glass-panel p-6 relative overflow-hidden group hover:border-[#30EEE2]/40 transition-all block"
+                        className="glass-panel p-5 relative overflow-hidden group hover:border-[#30EEE2]/40 transition-all flex flex-col justify-between"
                     >
-                        <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center mb-4 text-blue-400">
-                            <ShoppingCart className="w-6 h-6" />
+                        <div>
+                            <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center mb-3 text-blue-400">
+                                <ShoppingCart className="w-5 h-5" />
+                            </div>
+                            <h4 className="text-sm font-heading font-bold text-white mb-1">
+                                E-Commerce & B2B
+                            </h4>
+                            <p className="text-[11px] text-white/60 mb-3 leading-relaxed">
+                                Catálogo dinámico, pasarelas de pago, facturación AFIP y logística.
+                            </p>
                         </div>
-                        <h4 className="text-lg font-heading font-bold text-white mb-1">
-                            E-Commerce & B2B
-                        </h4>
-                        <p className="text-xs text-white/60 mb-4 leading-relaxed">
-                            Catálogo dinámico, pasarelas de pago (Mercado Pago/Stripe), facturación AFIP automática y logística.
-                        </p>
-                        <div className="flex items-center justify-between text-xs text-[#30EEE2] font-semibold">
-                            <span>Cotizar con este Preset</span>
-                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        <div className="flex items-center justify-between text-xs text-[#30EEE2] font-semibold pt-2 border-t border-white/5">
+                            <span>Cotizar</span>
+                            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                        </div>
+                    </Link>
+
+                    {/* Tarjeta Industria */}
+                    <Link
+                        href={route('quotes.create', { preset: 'industria' })}
+                        className="glass-panel p-5 relative overflow-hidden group hover:border-[#30EEE2]/40 transition-all flex flex-col justify-between"
+                    >
+                        <div>
+                            <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center mb-3 text-purple-400">
+                                <Factory className="w-5 h-5" />
+                            </div>
+                            <h4 className="text-sm font-heading font-bold text-white mb-1">
+                                Industria & Planta
+                            </h4>
+                            <p className="text-[11px] text-white/60 mb-3 leading-relaxed">
+                                Órdenes de producción, mantenimiento CMMS, calidad y sensores OEE.
+                            </p>
+                        </div>
+                        <div className="flex items-center justify-between text-xs text-[#30EEE2] font-semibold pt-2 border-t border-white/5">
+                            <span>Cotizar</span>
+                            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                        </div>
+                    </Link>
+
+                    {/* Tarjeta Servicios */}
+                    <Link
+                        href={route('quotes.create', { preset: 'servicios' })}
+                        className="glass-panel p-5 relative overflow-hidden group hover:border-[#30EEE2]/40 transition-all flex flex-col justify-between"
+                    >
+                        <div>
+                            <div className="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center mb-3 text-teal-400">
+                                <Briefcase className="w-5 h-5" />
+                            </div>
+                            <h4 className="text-sm font-heading font-bold text-white mb-1">
+                                Servicios & Consultoría
+                            </h4>
+                            <p className="text-[11px] text-white/60 mb-3 leading-relaxed">
+                                Portal de clientes SLA, tracking de horas, contratos y firma digital.
+                            </p>
+                        </div>
+                        <div className="flex items-center justify-between text-xs text-[#30EEE2] font-semibold pt-2 border-t border-white/5">
+                            <span>Cotizar</span>
+                            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                         </div>
                     </Link>
                 </div>

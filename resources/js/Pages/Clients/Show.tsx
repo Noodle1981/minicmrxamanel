@@ -24,6 +24,7 @@ import {
     HardHat,
     Leaf,
     ShoppingCart,
+    Factory,
     Briefcase,
 } from 'lucide-react';
 
@@ -45,11 +46,12 @@ export default function Show({ client, stats }: ShowProps) {
         }
     };
 
-    const industryBadges: Record<IndustryType, { label: string; color: string; icon: React.ComponentType<{ className?: string }> }> = {
+    const industryBadges: Record<string, { label: string; color: string; icon: React.ComponentType<{ className?: string }> }> = {
         mineria: { label: 'Minería & Faena', color: 'text-amber-400 bg-amber-500/10 border-amber-500/30', icon: HardHat },
         medio_ambiente: { label: 'Medio Ambiente', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30', icon: Leaf },
         comercio: { label: 'Comercio & B2B', color: 'text-blue-400 bg-blue-500/10 border-blue-500/30', icon: ShoppingCart },
-        servicios: { label: 'Servicios', color: 'text-purple-400 bg-purple-500/10 border-purple-500/30', icon: Briefcase },
+        industria: { label: 'Industria & Planta', color: 'text-purple-400 bg-purple-500/10 border-purple-500/30', icon: Factory },
+        servicios: { label: 'Servicios & Consultoría', color: 'text-teal-400 bg-teal-500/10 border-teal-500/30', icon: Briefcase },
         otro: { label: 'General / Otro', color: 'text-white/60 bg-white/5 border-white/10', icon: Building2 },
     };
 

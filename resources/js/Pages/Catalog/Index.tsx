@@ -215,20 +215,25 @@ export default function Index({ features, softwareTypes, categories, filters, me
                         Presets Disponibles
                     </span>
                     <div className="flex flex-wrap items-center gap-1.5 mt-1">
-                        <span className="text-[11px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold" title="Minería">
-                            ⛏️ {metrics.mining_preset_count}
+                        <span className="text-[11px] px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30 font-semibold inline-flex items-center gap-1" title="Preset: Minería & HSE">
+                            <HardHat className="w-3 h-3 text-amber-400" />
+                            <span>{metrics.mining_preset_count}</span>
                         </span>
-                        <span className="text-[11px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold" title="Medio Ambiente">
-                            🌱 {metrics.environment_preset_count}
+                        <span className="text-[11px] px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-semibold inline-flex items-center gap-1" title="Preset: Medio Ambiente">
+                            <Leaf className="w-3 h-3 text-emerald-400" />
+                            <span>{metrics.environment_preset_count}</span>
                         </span>
-                        <span className="text-[11px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 font-semibold" title="Comercio">
-                            🛒 {metrics.commerce_preset_count}
+                        <span className="text-[11px] px-2 py-0.5 rounded-md bg-blue-500/15 text-blue-300 border border-blue-500/30 font-semibold inline-flex items-center gap-1" title="Preset: E-Commerce & B2B">
+                            <ShoppingCart className="w-3 h-3 text-blue-400" />
+                            <span>{metrics.commerce_preset_count}</span>
                         </span>
-                        <span className="text-[11px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 font-semibold" title="Industria">
-                            🏭 {metrics.industry_preset_count || 0}
+                        <span className="text-[11px] px-2 py-0.5 rounded-md bg-purple-500/15 text-purple-300 border border-purple-500/30 font-semibold inline-flex items-center gap-1" title="Preset: Industria & Planta">
+                            <Factory className="w-3 h-3 text-purple-400" />
+                            <span>{metrics.industry_preset_count || 0}</span>
                         </span>
-                        <span className="text-[11px] px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30 font-semibold" title="Servicios">
-                            💼 {metrics.services_preset_count || 0}
+                        <span className="text-[11px] px-2 py-0.5 rounded-md bg-teal-500/15 text-teal-300 border border-teal-500/30 font-semibold inline-flex items-center gap-1" title="Preset: Servicios & Consultoría">
+                            <Briefcase className="w-3 h-3 text-teal-400" />
+                            <span>{metrics.services_preset_count || 0}</span>
                         </span>
                     </div>
                 </div>
@@ -613,54 +618,59 @@ export default function Index({ features, softwareTypes, categories, filters, me
                                     Presets Industriales Predeterminados
                                 </label>
                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                                    <label className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.02] border border-white/10 cursor-pointer text-xs">
+                                    <label className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.02] border border-white/10 cursor-pointer text-xs hover:bg-white/5 transition-colors">
                                         <input
                                             type="checkbox"
                                             checked={data.is_preset_mining}
                                             onChange={(e) => setData('is_preset_mining', e.target.checked)}
                                             className="rounded border-white/20 text-[#30EEE2] focus:ring-[#30EEE2]"
                                         />
-                                        <span>⛏️ Minería</span>
+                                        <HardHat className="w-3.5 h-3.5 text-amber-400" />
+                                        <span>Minería</span>
                                     </label>
 
-                                    <label className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.02] border border-white/10 cursor-pointer text-xs">
+                                    <label className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.02] border border-white/10 cursor-pointer text-xs hover:bg-white/5 transition-colors">
                                         <input
                                             type="checkbox"
                                             checked={data.is_preset_environment}
                                             onChange={(e) => setData('is_preset_environment', e.target.checked)}
                                             className="rounded border-white/20 text-[#30EEE2] focus:ring-[#30EEE2]"
                                         />
-                                        <span>🌱 Medio Ambiente</span>
+                                        <Leaf className="w-3.5 h-3.5 text-emerald-400" />
+                                        <span>Medio Ambiente</span>
                                     </label>
 
-                                    <label className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.02] border border-white/10 cursor-pointer text-xs">
+                                    <label className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.02] border border-white/10 cursor-pointer text-xs hover:bg-white/5 transition-colors">
                                         <input
                                             type="checkbox"
                                             checked={data.is_preset_commerce}
                                             onChange={(e) => setData('is_preset_commerce', e.target.checked)}
                                             className="rounded border-white/20 text-[#30EEE2] focus:ring-[#30EEE2]"
                                         />
-                                        <span>🛒 Comercio</span>
+                                        <ShoppingCart className="w-3.5 h-3.5 text-blue-400" />
+                                        <span>Comercio</span>
                                     </label>
 
-                                    <label className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.02] border border-white/10 cursor-pointer text-xs">
+                                    <label className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.02] border border-white/10 cursor-pointer text-xs hover:bg-white/5 transition-colors">
                                         <input
                                             type="checkbox"
                                             checked={data.is_preset_industry}
                                             onChange={(e) => setData('is_preset_industry', e.target.checked)}
                                             className="rounded border-white/20 text-[#30EEE2] focus:ring-[#30EEE2]"
                                         />
-                                        <span>🏭 Industria</span>
+                                        <Factory className="w-3.5 h-3.5 text-purple-400" />
+                                        <span>Industria</span>
                                     </label>
 
-                                    <label className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.02] border border-white/10 cursor-pointer text-xs">
+                                    <label className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.02] border border-white/10 cursor-pointer text-xs hover:bg-white/5 transition-colors">
                                         <input
                                             type="checkbox"
                                             checked={data.is_preset_services}
                                             onChange={(e) => setData('is_preset_services', e.target.checked)}
                                             className="rounded border-white/20 text-[#30EEE2] focus:ring-[#30EEE2]"
                                         />
-                                        <span>💼 Servicios</span>
+                                        <Briefcase className="w-3.5 h-3.5 text-teal-400" />
+                                        <span>Servicios</span>
                                     </label>
                                 </div>
                             </div>
