@@ -308,41 +308,41 @@ export default function Index({ features, softwareTypes, categories, filters, me
             <div className="glass-panel overflow-hidden mb-6">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs">
-                        <thead className="bg-white/[0.03] text-white/60 uppercase text-[10px] tracking-wider border-b border-white/10">
+                        <thead className="bg-white/[0.04] text-white/60 uppercase text-[10px] tracking-wider border-b border-white/15">
                             <tr>
-                                <th className="p-4 min-w-[340px]">Módulo / Feature & Alcance Técnico</th>
-                                <th className="p-4 min-w-[140px]">Categoría</th>
-                                <th className="p-4 text-center whitespace-nowrap">Matriz de Horas (Dev / Int / QA)</th>
-                                <th className="p-4 text-center whitespace-nowrap">Total hs</th>
-                                <th className="p-4 text-center whitespace-nowrap">Infraestructura</th>
-                                <th className="p-4 text-center whitespace-nowrap">Presets</th>
-                                <th className="p-4 text-right whitespace-nowrap">Acción</th>
+                                <th className="py-4 px-5 min-w-[360px]">Módulo / Feature & Alcance Técnico</th>
+                                <th className="py-4 px-5 min-w-[140px]">Categoría</th>
+                                <th className="py-4 px-5 text-center whitespace-nowrap">Matriz de Horas (Dev / Int / QA)</th>
+                                <th className="py-4 px-5 text-center whitespace-nowrap">Total hs</th>
+                                <th className="py-4 px-5 text-center whitespace-nowrap">Infraestructura</th>
+                                <th className="py-4 px-5 text-center whitespace-nowrap">Presets</th>
+                                <th className="py-4 px-5 text-right whitespace-nowrap">Acción</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="divide-y divide-white/10">
                             {features.data.map((feat) => {
                                 const totalHours = Number(feat.hours_dev) + Number(feat.hours_integration) + Number(feat.hours_testing_qa);
 
                                 return (
-                                    <tr key={feat.id} className="hover:bg-white/[0.02] transition-colors">
-                                        <td className="p-4.5 align-top">
-                                            <div className="font-heading font-bold text-white text-sm leading-snug">
+                                    <tr key={feat.id} className="hover:bg-white/[0.03] transition-colors">
+                                        <td className="py-5 px-5 align-top">
+                                            <div className="font-heading font-bold text-white text-[13px] tracking-tight">
                                                 {feat.name}
                                             </div>
                                             {feat.description && (
-                                                <p className="text-xs text-white/70 mt-1.5 leading-relaxed">
+                                                <p className="text-[11px] text-white/55 mt-1.5 leading-relaxed max-w-xl">
                                                     {feat.description}
                                                 </p>
                                             )}
                                         </td>
 
-                                        <td className="p-4.5 align-top">
-                                            <span className="text-[10px] px-2.5 py-1 rounded-md bg-white/5 text-white/80 border border-white/10 font-semibold inline-block">
+                                        <td className="py-5 px-5 align-top">
+                                            <span className="text-[10px] px-2.5 py-1 rounded-md bg-white/[0.06] text-white/80 border border-white/10 font-semibold inline-block">
                                                 {feat.category}
                                             </span>
                                         </td>
 
-                                        <td className="p-4.5 text-center align-top whitespace-nowrap">
+                                        <td className="py-5 px-5 text-center align-top whitespace-nowrap">
                                             <div className="flex items-center justify-center gap-1.5 font-mono text-xs">
                                                 <span className="text-indigo-300 font-bold bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20" title="Horas Dev">{feat.hours_dev}d Dev</span>
                                                 <span className="text-white/30">+</span>
@@ -352,13 +352,13 @@ export default function Index({ features, softwareTypes, categories, filters, me
                                             </div>
                                         </td>
 
-                                        <td className="p-4.5 text-center align-top whitespace-nowrap">
+                                        <td className="py-5 px-5 text-center align-top whitespace-nowrap">
                                             <span className="font-heading font-extrabold text-[#30EEE2] text-sm block">
                                                 {totalHours} hs
                                             </span>
                                         </td>
 
-                                        <td className="p-4.5 text-center align-top font-mono text-xs text-white/70 whitespace-nowrap">
+                                        <td className="py-5 px-5 text-center align-top font-mono text-xs text-white/70 whitespace-nowrap">
                                             {feat.cost_setup_infra > 0 || feat.cost_monthly_infra > 0 ? (
                                                 <div>
                                                     <div className="text-white font-medium">${feat.cost_setup_infra} setup</div>
@@ -369,7 +369,7 @@ export default function Index({ features, softwareTypes, categories, filters, me
                                             )}
                                         </td>
 
-                                        <td className="p-4.5 text-center align-top">
+                                        <td className="py-5 px-5 text-center align-top">
                                             <div className="flex flex-wrap items-center justify-center gap-1 max-w-[160px] mx-auto">
                                                 {feat.is_preset_mining && (
                                                     <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-medium" title="Minería">
@@ -399,7 +399,7 @@ export default function Index({ features, softwareTypes, categories, filters, me
                                             </div>
                                         </td>
 
-                                        <td className="p-4.5 text-right align-top whitespace-nowrap">
+                                        <td className="py-5 px-5 text-right align-top whitespace-nowrap">
                                             <button
                                                 type="button"
                                                 onClick={() => openEditModal(feat)}
