@@ -326,89 +326,89 @@ export default function Create({
                             <span className="text-xs text-[#30EEE2]">Atajo de preselección</span>
                         </div>
 
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
                             <button
                                 type="button"
                                 onClick={() => applyPreset('mineria')}
-                                className={`p-3 rounded-xl text-left border transition-all ${
+                                className={`p-4 rounded-xl text-left border transition-all ${
                                     data.preset_used === 'mineria'
                                         ? 'bg-amber-500/15 border-amber-400 text-white shadow-lg shadow-amber-500/10'
                                         : 'bg-white/[0.02] border-white/10 text-white/70 hover:bg-white/5 hover:text-white'
                                 }`}
                             >
-                                <HardHat className="w-5 h-5 text-amber-400 mb-1.5" />
-                                <div className="text-xs font-bold font-heading">Minería & HSE</div>
-                                <div className="text-[10px] text-white/50">Sensores, GIS, Offline</div>
+                                <HardHat className="w-5 h-5 text-amber-400 mb-2" />
+                                <div className="text-sm font-bold font-heading">Minería & HSE</div>
+                                <div className="text-xs text-white/50 mt-0.5">Sensores, GIS, Offline</div>
                             </button>
 
                             <button
                                 type="button"
                                 onClick={() => applyPreset('medio_ambiente')}
-                                className={`p-3 rounded-xl text-left border transition-all ${
+                                className={`p-4 rounded-xl text-left border transition-all ${
                                     data.preset_used === 'medio_ambiente'
                                         ? 'bg-emerald-500/15 border-emerald-400 text-white shadow-lg shadow-emerald-500/10'
                                         : 'bg-white/[0.02] border-white/10 text-white/70 hover:bg-white/5 hover:text-white'
                                 }`}
                             >
-                                <Leaf className="w-5 h-5 text-emerald-400 mb-1.5" />
-                                <div className="text-xs font-bold font-heading">Medio Ambiente</div>
-                                <div className="text-[10px] text-white/50">Matrices, Ensayos, CO2</div>
+                                <Leaf className="w-5 h-5 text-emerald-400 mb-2" />
+                                <div className="text-sm font-bold font-heading">Medio Ambiente</div>
+                                <div className="text-xs text-white/50 mt-0.5">Matrices, Ensayos, CO2</div>
                             </button>
 
                             <button
                                 type="button"
                                 onClick={() => applyPreset('comercio')}
-                                className={`p-3 rounded-xl text-left border transition-all ${
+                                className={`p-4 rounded-xl text-left border transition-all ${
                                     data.preset_used === 'comercio'
                                         ? 'bg-blue-500/15 border-blue-400 text-white shadow-lg shadow-blue-500/10'
                                         : 'bg-white/[0.02] border-white/10 text-white/70 hover:bg-white/5 hover:text-white'
                                 }`}
                             >
-                                <ShoppingCart className="w-5 h-5 text-blue-400 mb-1.5" />
-                                <div className="text-xs font-bold font-heading">E-Commerce & B2B</div>
-                                <div className="text-[10px] text-white/50">AFIP, Pagos, Stock</div>
+                                <ShoppingCart className="w-5 h-5 text-blue-400 mb-2" />
+                                <div className="text-sm font-bold font-heading">E-Commerce & B2B</div>
+                                <div className="text-xs text-white/50 mt-0.5">AFIP, Pagos, Stock</div>
                             </button>
 
                             <button
                                 type="button"
                                 onClick={() => applyPreset('industria')}
-                                className={`p-3 rounded-xl text-left border transition-all ${
+                                className={`p-4 rounded-xl text-left border transition-all ${
                                     data.preset_used === 'industria'
                                         ? 'bg-purple-500/15 border-purple-400 text-white shadow-lg shadow-purple-500/10'
                                         : 'bg-white/[0.02] border-white/10 text-white/70 hover:bg-white/5 hover:text-white'
                                 }`}
                             >
-                                <Factory className="w-5 h-5 text-purple-400 mb-1.5" />
-                                <div className="text-xs font-bold font-heading">Industria & Planta</div>
-                                <div className="text-[10px] text-white/50">Lotes, CMMS, OEE</div>
+                                <Factory className="w-5 h-5 text-purple-400 mb-2" />
+                                <div className="text-sm font-bold font-heading">Industria & Planta</div>
+                                <div className="text-xs text-white/50 mt-0.5">Lotes, CMMS, OEE</div>
                             </button>
 
                             <button
                                 type="button"
                                 onClick={() => applyPreset('servicios')}
-                                className={`p-3 rounded-xl text-left border transition-all ${
+                                className={`p-4 rounded-xl text-left border transition-all ${
                                     data.preset_used === 'servicios'
                                         ? 'bg-teal-500/15 border-teal-400 text-white shadow-lg shadow-teal-500/10'
                                         : 'bg-white/[0.02] border-white/10 text-white/70 hover:bg-white/5 hover:text-white'
                                 }`}
                             >
-                                <Briefcase className="w-5 h-5 text-teal-400 mb-1.5" />
-                                <div className="text-xs font-bold font-heading">Servicios & Cons.</div>
-                                <div className="text-[10px] text-white/50">SLA, Horas, Abonos</div>
+                                <Briefcase className="w-5 h-5 text-teal-400 mb-2" />
+                                <div className="text-sm font-bold font-heading">Servicios & Consultoría</div>
+                                <div className="text-xs text-white/50 mt-0.5">SLA, Horas, Abonos</div>
                             </button>
 
                             <button
                                 type="button"
                                 onClick={() => applyPreset('personalizado')}
-                                className={`p-3 rounded-xl text-left border transition-all ${
+                                className={`p-4 rounded-xl text-left border transition-all ${
                                     data.preset_used === 'personalizado'
                                         ? 'bg-[#30EEE2]/15 border-[#30EEE2] text-white shadow-lg shadow-[#30EEE2]/10'
                                         : 'bg-white/[0.02] border-white/10 text-white/70 hover:bg-white/5 hover:text-white'
                                 }`}
                             >
-                                <Sliders className="w-5 h-5 text-[#30EEE2] mb-1.5" />
-                                <div className="text-xs font-bold font-heading">Personalizado</div>
-                                <div className="text-[10px] text-white/50">Selección libre</div>
+                                <Sliders className="w-5 h-5 text-[#30EEE2] mb-2" />
+                                <div className="text-sm font-bold font-heading">Personalizado</div>
+                                <div className="text-xs text-white/50 mt-0.5">Selección manual libre</div>
                             </button>
                         </div>
                     </div>
