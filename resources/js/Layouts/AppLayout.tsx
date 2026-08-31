@@ -144,7 +144,9 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
                     className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm md:hidden"
                     onClick={() => setSidebarOpen(false)}
                 />
-                  {/* ==================== SIDEBAR MINIMALISTA DE ICONOS ==================== */}
+            )}
+
+            {/* ==================== SIDEBAR MINIMALISTA DE ICONOS ==================== */}
             <aside
                 className={`fixed inset-y-0 left-0 z-50 w-20 bg-[#0F1420]/95 backdrop-blur-2xl border-r border-white/10 flex flex-col items-center justify-between py-5 shrink-0 transition-transform duration-300 ease-in-out md:static md:translate-x-0 ${
                     sidebarOpen ? 'translate-x-0' : '-translate-x-full'
