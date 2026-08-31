@@ -119,7 +119,7 @@ class QuoteController extends Controller
             'client_id' => 'required|exists:clients,id',
             'software_type_id' => 'required|exists:software_types,id',
             'title' => 'required|string|max:255',
-            'preset_used' => 'nullable|string|in:mineria,medio_ambiente,comercio,personalizado',
+            'preset_used' => 'nullable|string|in:mineria,medio_ambiente,comercio,industria,servicios,personalizado',
             'hourly_rate' => 'required|numeric|min:1',
             'team_capacity_hours_per_day' => 'required|numeric|min:1|max:24',
             'discount_percentage' => 'nullable|numeric|min:0|max:100',

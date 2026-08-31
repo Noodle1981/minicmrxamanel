@@ -7,6 +7,8 @@ import {
     HardHat,
     Leaf,
     ShoppingCart,
+    Factory,
+    Briefcase,
     Sliders,
     Sparkles,
     Calendar,
@@ -43,17 +45,17 @@ export default function Create({
 }: CreateQuoteProps) {
     // Formulario reactivo de Inertia
     const { data, setData, post, processing, errors } = useForm({
-        client_id: preselectedClientId || (clients[0]?.id ? String(clients[0].id) : ''),
-        software_type_id: softwareTypes[0]?.id ? String(softwareTypes[0].id) : '',
+        client_id: preselectedClientId ? String(preselectedClientId) : '',
+        software_type_id: softwareTypes[0] ? String(softwareTypes[0].id) : '',
         title: '',
-        preset_used: preselectedPreset || 'personalizado',
+        preset_used: 'mineria' as 'mineria' | 'medio_ambiente' | 'comercio' | 'industria' | 'servicios' | 'personalizado',
         hourly_rate: 35,
         team_capacity_hours_per_day: 8,
         discount_percentage: 0,
-        estimated_start_date: new Date(Date.now() + 86400000).toISOString().split('T')[0], // Mañana
-        valid_until: new Date(Date.now() + 15 * 86400000).toISOString().split('T')[0], // 15 días
+        estimated_start_date: new Date().toISOString().slice(0, 10),
+        valid_until: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
         notes: '',
-        terms_conditions: 'Presupuesto válido por 15 días corridos. Incluye 3 meses de soporte correctivo y garantía técnica pos-despliegue.',
+        terms_conditions: 'Presupuesto válido por 15 días corridos. Incluye 3 meses de garantía técnica, control de versiones y soporte pos-lanzamiento.',
         selected_feature_ids: [] as number[],
     });
 
@@ -63,7 +65,7 @@ export default function Create({
     }, [data.software_type_id, softwareTypes]);
 
     // Aplicar preset por industria
-    const applyPreset = (presetName: 'mineria' | 'medio_ambiente' | 'comercio' | 'personalizado') => {
+    const applyPreset = (presetName: 'mineria' | 'medio_ambiente' | 'comercio' | 'industria' | 'servicios' | 'personalizado') => {
         setData((prev) => {
             let matchingFeatures: Feature[] = [];
             let recommendedTypeId = prev.software_type_id;
@@ -84,6 +86,16 @@ export default function Create({
                 const commType = softwareTypes.find((st) => st.slug.includes('ecommerce'));
                 if (commType) recommendedTypeId = String(commType.id);
                 autoTitle = 'Portal E-Commerce B2B con Facturación AFIP';
+            } else if (presetName === 'industria') {
+                matchingFeatures = features.filter((f) => f.is_preset_industry);
+                const indType = softwareTypes.find((st) => st.slug.includes('erp') || st.slug.includes('gestion'));
+                if (indType) recommendedTypeId = String(indType.id);
+                autoTitle = 'Sistema de Control de Producción y Mantenimiento Industrial';
+            } else if (presetName === 'servicios') {
+                matchingFeatures = features.filter((f) => f.is_preset_services);
+                const srvType = softwareTypes.find((st) => st.slug.includes('saas') || st.slug.includes('corporate') || st.slug.includes('landing'));
+                if (srvType) recommendedTypeId = String(srvType.id);
+                autoTitle = 'Portal de Gestión de Servicios, Clientes y Facturación';
             } else {
                 matchingFeatures = [];
             }
@@ -115,7 +127,7 @@ export default function Create({
 
     // Inicializar preset si vino por query param
     useEffect(() => {
-        if (preselectedPreset && ['mineria', 'medio_ambiente', 'comercio'].includes(preselectedPreset)) {
+        if (preselectedPreset && ['mineria', 'medio_ambiente', 'comercio', 'industria', 'servicios'].includes(preselectedPreset)) {
             applyPreset(preselectedPreset as any);
         } else if (features.length > 0 && data.selected_feature_ids.length === 0) {
             // Aplicar minería por defecto para que la pantalla no nazca vacía
@@ -314,11 +326,11 @@ export default function Create({
                             <span className="text-xs text-[#30EEE2]">Atajo de preselección</span>
                         </div>
 
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
                             <button
                                 type="button"
                                 onClick={() => applyPreset('mineria')}
-                                className={`p-3.5 rounded-xl text-left border transition-all ${
+                                className={`p-3 rounded-xl text-left border transition-all ${
                                     data.preset_used === 'mineria'
                                         ? 'bg-amber-500/15 border-amber-400 text-white shadow-lg shadow-amber-500/10'
                                         : 'bg-white/[0.02] border-white/10 text-white/70 hover:bg-white/5 hover:text-white'
@@ -332,7 +344,7 @@ export default function Create({
                             <button
                                 type="button"
                                 onClick={() => applyPreset('medio_ambiente')}
-                                className={`p-3.5 rounded-xl text-left border transition-all ${
+                                className={`p-3 rounded-xl text-left border transition-all ${
                                     data.preset_used === 'medio_ambiente'
                                         ? 'bg-emerald-500/15 border-emerald-400 text-white shadow-lg shadow-emerald-500/10'
                                         : 'bg-white/[0.02] border-white/10 text-white/70 hover:bg-white/5 hover:text-white'
@@ -346,7 +358,7 @@ export default function Create({
                             <button
                                 type="button"
                                 onClick={() => applyPreset('comercio')}
-                                className={`p-3.5 rounded-xl text-left border transition-all ${
+                                className={`p-3 rounded-xl text-left border transition-all ${
                                     data.preset_used === 'comercio'
                                         ? 'bg-blue-500/15 border-blue-400 text-white shadow-lg shadow-blue-500/10'
                                         : 'bg-white/[0.02] border-white/10 text-white/70 hover:bg-white/5 hover:text-white'
@@ -359,8 +371,36 @@ export default function Create({
 
                             <button
                                 type="button"
+                                onClick={() => applyPreset('industria')}
+                                className={`p-3 rounded-xl text-left border transition-all ${
+                                    data.preset_used === 'industria'
+                                        ? 'bg-purple-500/15 border-purple-400 text-white shadow-lg shadow-purple-500/10'
+                                        : 'bg-white/[0.02] border-white/10 text-white/70 hover:bg-white/5 hover:text-white'
+                                }`}
+                            >
+                                <Factory className="w-5 h-5 text-purple-400 mb-1.5" />
+                                <div className="text-xs font-bold font-heading">Industria & Planta</div>
+                                <div className="text-[10px] text-white/50">Lotes, CMMS, OEE</div>
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => applyPreset('servicios')}
+                                className={`p-3 rounded-xl text-left border transition-all ${
+                                    data.preset_used === 'servicios'
+                                        ? 'bg-teal-500/15 border-teal-400 text-white shadow-lg shadow-teal-500/10'
+                                        : 'bg-white/[0.02] border-white/10 text-white/70 hover:bg-white/5 hover:text-white'
+                                }`}
+                            >
+                                <Briefcase className="w-5 h-5 text-teal-400 mb-1.5" />
+                                <div className="text-xs font-bold font-heading">Servicios & Cons.</div>
+                                <div className="text-[10px] text-white/50">SLA, Horas, Abonos</div>
+                            </button>
+
+                            <button
+                                type="button"
                                 onClick={() => applyPreset('personalizado')}
-                                className={`p-3.5 rounded-xl text-left border transition-all ${
+                                className={`p-3 rounded-xl text-left border transition-all ${
                                     data.preset_used === 'personalizado'
                                         ? 'bg-[#30EEE2]/15 border-[#30EEE2] text-white shadow-lg shadow-[#30EEE2]/10'
                                         : 'bg-white/[0.02] border-white/10 text-white/70 hover:bg-white/5 hover:text-white'
@@ -368,7 +408,7 @@ export default function Create({
                             >
                                 <Sliders className="w-5 h-5 text-[#30EEE2] mb-1.5" />
                                 <div className="text-xs font-bold font-heading">Personalizado</div>
-                                <div className="text-[10px] text-white/50">Selección manual libre</div>
+                                <div className="text-[10px] text-white/50">Selección libre</div>
                             </button>
                         </div>
                     </div>

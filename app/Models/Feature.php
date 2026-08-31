@@ -25,6 +25,8 @@ class Feature extends Model
         'is_preset_mining',
         'is_preset_environment',
         'is_preset_commerce',
+        'is_preset_industry',
+        'is_preset_services',
         'is_recommended',
         'is_active',
     ];
@@ -40,6 +42,8 @@ class Feature extends Model
             'is_preset_mining' => 'boolean',
             'is_preset_environment' => 'boolean',
             'is_preset_commerce' => 'boolean',
+            'is_preset_industry' => 'boolean',
+            'is_preset_services' => 'boolean',
             'is_recommended' => 'boolean',
             'is_active' => 'boolean',
         ];

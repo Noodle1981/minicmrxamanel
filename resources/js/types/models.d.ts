@@ -131,6 +131,8 @@ export interface Feature {
     is_preset_mining: boolean;
     is_preset_environment: boolean;
     is_preset_commerce: boolean;
+    is_preset_industry: boolean;
+    is_preset_services: boolean;
     is_recommended: boolean;
     is_active: boolean;
     software_type?: SoftwareType | null;

@@ -30,6 +30,10 @@ class CatalogController extends Controller
                 $query->where('is_preset_environment', true);
             } elseif ($preset === 'commerce') {
                 $query->where('is_preset_commerce', true);
+            } elseif ($preset === 'industry') {
+                $query->where('is_preset_industry', true);
+            } elseif ($preset === 'services') {
+                $query->where('is_preset_services', true);
             }
         }
 
@@ -53,6 +57,8 @@ class CatalogController extends Controller
             'mining_preset_count' => Feature::where('is_preset_mining', true)->count(),
             'environment_preset_count' => Feature::where('is_preset_environment', true)->count(),
             'commerce_preset_count' => Feature::where('is_preset_commerce', true)->count(),
+            'industry_preset_count' => Feature::where('is_preset_industry', true)->count(),
+            'services_preset_count' => Feature::where('is_preset_services', true)->count(),
             'avg_dev_hours' => round(Feature::avg('hours_dev'), 1),
             'avg_qa_hours' => round(Feature::avg('hours_testing_qa'), 1),
         ];
@@ -83,6 +89,8 @@ class CatalogController extends Controller
             'is_preset_mining' => 'nullable|boolean',
             'is_preset_environment' => 'nullable|boolean',
             'is_preset_commerce' => 'nullable|boolean',
+            'is_preset_industry' => 'nullable|boolean',
+            'is_preset_services' => 'nullable|boolean',
             'software_type_id' => 'nullable|exists:software_types,id',
         ]);
 
@@ -108,6 +116,8 @@ class CatalogController extends Controller
             'is_preset_mining' => $validated['is_preset_mining'] ?? false,
             'is_preset_environment' => $validated['is_preset_environment'] ?? false,
             'is_preset_commerce' => $validated['is_preset_commerce'] ?? false,
+            'is_preset_industry' => $validated['is_preset_industry'] ?? false,
+            'is_preset_services' => $validated['is_preset_services'] ?? false,
             'is_active' => true,
         ]);
 
@@ -131,6 +141,8 @@ class CatalogController extends Controller
             'is_preset_mining' => 'nullable|boolean',
             'is_preset_environment' => 'nullable|boolean',
             'is_preset_commerce' => 'nullable|boolean',
+            'is_preset_industry' => 'nullable|boolean',
+            'is_preset_services' => 'nullable|boolean',
             'is_active' => 'nullable|boolean',
             'software_type_id' => 'nullable|exists:software_types,id',
         ]);
@@ -148,6 +160,8 @@ class CatalogController extends Controller
             'is_preset_mining' => $validated['is_preset_mining'] ?? false,
             'is_preset_environment' => $validated['is_preset_environment'] ?? false,
             'is_preset_commerce' => $validated['is_preset_commerce'] ?? false,
+            'is_preset_industry' => $validated['is_preset_industry'] ?? false,
+            'is_preset_services' => $validated['is_preset_services'] ?? false,
             'is_active' => $validated['is_active'] ?? true,
         ]);
 

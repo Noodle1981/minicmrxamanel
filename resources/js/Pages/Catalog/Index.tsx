@@ -13,6 +13,8 @@ import {
     HardHat,
     Leaf,
     ShoppingCart,
+    Factory,
+    Briefcase,
     CheckCircle2,
     Clock,
     DollarSign,
@@ -42,6 +44,8 @@ interface IndexProps {
         mining_preset_count: number;
         environment_preset_count: number;
         commerce_preset_count: number;
+        industry_preset_count: number;
+        services_preset_count: number;
         avg_dev_hours: number;
         avg_qa_hours: number;
     };
@@ -69,6 +73,8 @@ export default function Index({ features, softwareTypes, categories, filters, me
         is_preset_mining: false,
         is_preset_environment: false,
         is_preset_commerce: false,
+        is_preset_industry: false,
+        is_preset_services: false,
         is_active: true,
     });
 
@@ -97,6 +103,8 @@ export default function Index({ features, softwareTypes, categories, filters, me
             is_preset_mining: false,
             is_preset_environment: false,
             is_preset_commerce: false,
+            is_preset_industry: false,
+            is_preset_services: false,
             is_active: true,
         });
         setModalOpen(true);
@@ -117,6 +125,8 @@ export default function Index({ features, softwareTypes, categories, filters, me
             is_preset_mining: feat.is_preset_mining,
             is_preset_environment: feat.is_preset_environment,
             is_preset_commerce: feat.is_preset_commerce,
+            is_preset_industry: feat.is_preset_industry || false,
+            is_preset_services: feat.is_preset_services || false,
             is_active: feat.is_active,
         });
         setModalOpen(true);
@@ -204,15 +214,21 @@ export default function Index({ features, softwareTypes, categories, filters, me
                     <span className="text-xs font-semibold text-white/50 uppercase tracking-wider block mb-1">
                         Presets Disponibles
                     </span>
-                    <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold" title="Minería">
+                    <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                        <span className="text-[11px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold" title="Minería">
                             ⛏️ {metrics.mining_preset_count}
                         </span>
-                        <span className="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold" title="Medio Ambiente">
+                        <span className="text-[11px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold" title="Medio Ambiente">
                             🌱 {metrics.environment_preset_count}
                         </span>
-                        <span className="text-xs px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 font-semibold" title="Comercio">
+                        <span className="text-[11px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 font-semibold" title="Comercio">
                             🛒 {metrics.commerce_preset_count}
+                        </span>
+                        <span className="text-[11px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 font-semibold" title="Industria">
+                            🏭 {metrics.industry_preset_count || 0}
+                        </span>
+                        <span className="text-[11px] px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30 font-semibold" title="Servicios">
+                            💼 {metrics.services_preset_count || 0}
                         </span>
                     </div>
                 </div>
@@ -271,6 +287,8 @@ export default function Index({ features, softwareTypes, categories, filters, me
                             <option value="mining">Preset Minería & HSE</option>
                             <option value="environment">Preset Medio Ambiente</option>
                             <option value="commerce">Preset Comercio & B2B</option>
+                            <option value="industry">Preset Industria & Planta</option>
+                            <option value="services">Preset Servicios & Consultoría</option>
                         </select>
                     </div>
 
@@ -352,20 +370,30 @@ export default function Index({ features, softwareTypes, categories, filters, me
                                         </td>
 
                                         <td className="p-4 text-center">
-                                            <div className="flex items-center justify-center gap-1">
+                                            <div className="flex flex-wrap items-center justify-center gap-1 max-w-[150px] mx-auto">
                                                 {feat.is_preset_mining && (
-                                                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30" title="Minería">
+                                                    <span className="text-[9px] px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30" title="Minería">
                                                         ⛏️ Min
                                                     </span>
                                                 )}
                                                 {feat.is_preset_environment && (
-                                                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" title="Medio Ambiente">
+                                                    <span className="text-[9px] px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" title="Medio Ambiente">
                                                         🌱 Amb
                                                     </span>
                                                 )}
                                                 {feat.is_preset_commerce && (
-                                                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30" title="Comercio">
+                                                    <span className="text-[9px] px-1 py-0.2 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30" title="Comercio">
                                                         🛒 Com
+                                                    </span>
+                                                )}
+                                                {feat.is_preset_industry && (
+                                                    <span className="text-[9px] px-1 py-0.2 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30" title="Industria">
+                                                        🏭 Ind
+                                                    </span>
+                                                )}
+                                                {feat.is_preset_services && (
+                                                    <span className="text-[9px] px-1 py-0.2 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30" title="Servicios">
+                                                        💼 Srv
                                                     </span>
                                                 )}
                                             </div>
@@ -415,7 +443,7 @@ export default function Index({ features, softwareTypes, categories, filters, me
                                         type="text"
                                         value={data.name}
                                         onChange={(e) => setData('name', e.target.value)}
-                                        placeholder="Ej. Telemetría de Sensores en Tiempo Real"
+                                        placeholder="Ej. Control de Calidad en Línea"
                                         className="w-full input-xamanen text-xs"
                                         required
                                     />
@@ -429,7 +457,7 @@ export default function Index({ features, softwareTypes, categories, filters, me
                                         type="text"
                                         value={data.category}
                                         onChange={(e) => setData('category', e.target.value)}
-                                        placeholder="Ej. Telemetría, Seguridad, Core..."
+                                        placeholder="Ej. Industria & Manufactura, Servicios..."
                                         className="w-full input-xamanen text-xs"
                                         required
                                     />
@@ -558,7 +586,7 @@ export default function Index({ features, softwareTypes, categories, filters, me
                                 <label className="block text-xs font-semibold text-white/70 uppercase tracking-wider mb-2">
                                     Presets Industriales Predeterminados
                                 </label>
-                                <div className="grid grid-cols-3 gap-3">
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                                     <label className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.02] border border-white/10 cursor-pointer text-xs">
                                         <input
                                             type="checkbox"
@@ -587,6 +615,26 @@ export default function Index({ features, softwareTypes, categories, filters, me
                                             className="rounded border-white/20 text-[#30EEE2] focus:ring-[#30EEE2]"
                                         />
                                         <span>🛒 Comercio</span>
+                                    </label>
+
+                                    <label className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.02] border border-white/10 cursor-pointer text-xs">
+                                        <input
+                                            type="checkbox"
+                                            checked={data.is_preset_industry}
+                                            onChange={(e) => setData('is_preset_industry', e.target.checked)}
+                                            className="rounded border-white/20 text-[#30EEE2] focus:ring-[#30EEE2]"
+                                        />
+                                        <span>🏭 Industria</span>
+                                    </label>
+
+                                    <label className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.02] border border-white/10 cursor-pointer text-xs">
+                                        <input
+                                            type="checkbox"
+                                            checked={data.is_preset_services}
+                                            onChange={(e) => setData('is_preset_services', e.target.checked)}
+                                            className="rounded border-white/20 text-[#30EEE2] focus:ring-[#30EEE2]"
+                                        />
+                                        <span>💼 Servicios</span>
                                     </label>
                                 </div>
                             </div>
