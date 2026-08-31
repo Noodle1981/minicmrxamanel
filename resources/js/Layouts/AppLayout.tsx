@@ -61,7 +61,7 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
             href: route('dashboard'),
             routePattern: 'dashboard',
             icon: LayoutDashboard,
-            roles: ['super_admin', 'vendedor', 'desarrollador', 'disenador', 'qa_tester', 'validador', 'cliente'],
+            roles: ['super_admin', 'vendedor', 'desarrollador', 'disenador', 'qa_tester', 'validador'],
         },
         {
             name: 'Cotizador CPQ',
@@ -75,7 +75,7 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
             href: route('quotes.index'),
             routePattern: 'quotes.index',
             icon: FileText,
-            roles: ['super_admin', 'vendedor', 'cliente'],
+            roles: ['super_admin', 'vendedor'],
         },
         {
             name: 'Clientes (Mini-CRM)',
@@ -106,18 +106,11 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
             roles: ['super_admin', 'desarrollador', 'disenador', 'qa_tester', 'validador', 'vendedor'],
         },
         {
-            name: 'Portal del Cliente',
-            href: route('portal.dashboard'),
-            routePattern: 'portal.*',
-            icon: FileText,
-            roles: ['cliente', 'super_admin', 'vendedor'],
-        },
-        {
             name: 'Catálogo & Matriz IA',
             href: route('catalog.index'),
             routePattern: 'catalog.*',
             icon: Layers,
-            roles: ['super_admin'],
+            roles: ['super_admin', 'vendedor', 'desarrollador', 'validador'],
         },
         {
             name: 'Administración & Roles',
@@ -137,7 +130,6 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
     const roleLabels: Record<RoleName, { label: string; color: string }> = {
         super_admin: { label: 'Super Admin', color: 'bg-[#65005E]/40 text-[#F0F2F5] border-[#65005E]' },
         vendedor: { label: 'Comercial / Ventas', color: 'bg-[#3C84CE]/20 text-[#30EEE2] border-[#3C84CE]/40' },
-        cliente: { label: 'Portal Cliente', color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' },
         desarrollador: { label: 'Desarrollador', color: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40' },
         disenador: { label: 'Diseñador UI/UX', color: 'bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-500/40' },
         qa_tester: { label: 'QA & Testing', color: 'bg-amber-500/20 text-amber-300 border-amber-500/40' },

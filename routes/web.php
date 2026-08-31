@@ -4,7 +4,6 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\ClientController;
-use App\Http\Controllers\ClientPortalController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\QuoteController;
@@ -55,12 +54,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/admin/users', [AdminController::class, 'store'])->name('admin.users.store');
     Route::patch('/admin/users/{user}', [AdminController::class, 'update'])->name('admin.users.update');
     Route::patch('/admin/users/{user}/toggle', [AdminController::class, 'toggleStatus'])->name('admin.users.toggle');
-
-    // Portal del Cliente
-    Route::get('/portal', [ClientPortalController::class, 'index'])->name('portal.dashboard');
-    Route::get('/portal/quotes/{quote}', [ClientPortalController::class, 'showQuote'])->name('portal.quotes.show');
-    Route::post('/portal/quotes/{quote}/respond', [ClientPortalController::class, 'respondQuote'])->name('portal.quotes.respond');
-    Route::post('/portal/quotes/{quote}/comment', [ClientPortalController::class, 'addComment'])->name('portal.quotes.comment');
 
     // Perfil de Usuario
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

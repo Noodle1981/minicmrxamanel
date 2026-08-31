@@ -131,7 +131,6 @@ export default function Index({ users, roles, filters, metrics }: IndexProps) {
         disenador: 'bg-pink-500/25 text-pink-300 border-pink-500/50',
         qa_tester: 'bg-amber-500/25 text-amber-300 border-amber-500/50',
         validador: 'bg-teal-500/25 text-teal-300 border-teal-500/50',
-        cliente: 'bg-emerald-500/25 text-emerald-300 border-emerald-500/50',
     };
 
     return (

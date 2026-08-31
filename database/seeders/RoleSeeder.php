@@ -24,11 +24,6 @@ class RoleSeeder extends Seeder
                 'description' => 'Alta de prospectos, cotización de presupuestos interactivos y seguimiento comercial de clientes.',
             ],
             [
-                'name' => 'cliente',
-                'display_name' => 'Cliente / Comprador',
-                'description' => 'Acceso al portal de clientes para revisar, aceptar o rechazar cotizaciones y ver el estado de su proyecto.',
-            ],
-            [
                 'name' => 'desarrollador',
                 'display_name' => 'Desarrollador Full-Stack',
                 'description' => 'Miembro del equipo técnico para construcción de features, integraciones y resolución de tickets.',

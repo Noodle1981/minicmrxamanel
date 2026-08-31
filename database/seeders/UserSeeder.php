@@ -73,17 +73,5 @@ class UserSeeder extends Seeder
             ]
         );
         $designer->roles()->syncWithoutDetaching([$designerRole->id]);
-
-        // 5. Usuario Cliente
-        $clienteUser = User::firstOrCreate(
-            ['email' => 'contacto@mineraandina.com'],
-            [
-                'name' => 'Ing. Carlos Mendoza',
-                'password' => Hash::make('password'),
-                'phone' => '+54 264 421-9988',
-                'is_active' => true,
-            ]
-        );
-        $clienteUser->roles()->syncWithoutDetaching([$clienteRole->id]);
     }
 }

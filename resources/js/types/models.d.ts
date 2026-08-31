@@ -1,7 +1,6 @@
 export type RoleName = 
     | 'super_admin'
     | 'vendedor'
-    | 'cliente'
     | 'desarrollador'
     | 'disenador'
     | 'qa_tester'
