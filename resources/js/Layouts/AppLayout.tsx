@@ -148,12 +148,12 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
 
             {/* ==================== SIDEBAR MINIMALISTA DE ICONOS ==================== */}
             <aside
-                className={`fixed inset-y-0 left-0 z-50 w-20 bg-[#0F1420]/95 backdrop-blur-2xl border-r border-white/10 flex flex-col items-center justify-between py-5 shrink-0 transition-transform duration-300 ease-in-out md:static md:translate-x-0 ${
+                className={`fixed inset-y-0 left-0 z-50 w-20 bg-[#0F1420]/95 backdrop-blur-2xl border-r border-white/10 flex flex-col items-center justify-between py-5 shrink-0 transition-transform duration-300 ease-in-out md:static md:translate-x-0 overflow-visible ${
                     sidebarOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
             >
                 {/* 1. Logo Superior */}
-                <div className="flex flex-col items-center gap-3">
+                <div className="flex flex-col items-center gap-3 relative overflow-visible">
                     <Link
                         href={route('dashboard')}
                         className="w-12 h-12 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-[#30EEE2]/40 flex items-center justify-center p-2 transition-all relative group shadow-lg"
@@ -164,7 +164,7 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
                             className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(48,238,226,0.3)] group-hover:scale-110 transition-transform"
                         />
                         {/* Tooltip Flotante */}
-                        <div className="absolute left-[calc(100%+14px)] top-1/2 -translate-y-1/2 px-4 py-2 rounded-xl bg-black text-white font-semibold text-xs shadow-2xl border border-white/15 whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-200 z-50">
+                        <div className="absolute left-[calc(100%+14px)] top-1/2 -translate-y-1/2 px-4 py-2 rounded-xl bg-black text-white font-semibold text-xs shadow-2xl border border-white/15 whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-200 z-[9999]">
                             Grupo Xamanen — Inicio
                             <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-black border-l border-b border-white/15 rotate-45"></div>
                         </div>
@@ -179,7 +179,7 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
                 </div>
 
                 {/* 2. Menú de Navegación por Iconos */}
-                <nav className="flex-1 flex flex-col items-center gap-3 py-6 overflow-y-auto custom-scrollbar w-full px-3">
+                <nav className="flex-1 flex flex-col items-center gap-3 py-4 w-full px-3 overflow-visible">
                     {visibleNavItems.map((item, index) => {
                         const Icon = item.icon;
 
@@ -231,7 +231,7 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
                                 )}
 
                                 {/* Tooltip Flotante Negro Píldora (Estilo Imagen de Referencia) */}
-                                <div className="absolute left-[calc(100%+14px)] top-1/2 -translate-y-1/2 px-4 py-2.5 rounded-2xl bg-black text-white font-medium text-xs shadow-2xl border border-white/15 whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-200 z-50 flex items-center gap-2.5">
+                                <div className="absolute left-[calc(100%+14px)] top-1/2 -translate-y-1/2 px-4 py-2.5 rounded-2xl bg-black text-white font-medium text-xs shadow-2xl border border-white/20 whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-200 z-[9999] flex items-center gap-2.5 drop-shadow-[0_10px_25px_rgba(0,0,0,0.8)]">
                                     <span className="font-heading font-semibold tracking-wide">{item.name}</span>
                                     {item.badge && (
                                         <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-[#30EEE2]/20 text-[#30EEE2] border border-[#30EEE2]/40">
@@ -239,7 +239,7 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
                                         </span>
                                     )}
                                     {/* Flechita orientada al icono */}
-                                    <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-black border-l border-b border-white/15 rotate-45"></div>
+                                    <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-black border-l border-b border-white/20 rotate-45"></div>
                                 </div>
                             </Link>
                         );
@@ -247,7 +247,7 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
                 </nav>
 
                 {/* 3. Footer de Usuario y Cerrar Sesión */}
-                <div className="flex flex-col items-center gap-3 pt-4 border-t border-white/10 w-full px-3">
+                <div className="flex flex-col items-center gap-3 pt-4 border-t border-white/10 w-full px-3 relative overflow-visible">
                     <Link
                         href={route('logout')}
                         method="post"
@@ -258,7 +258,7 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
                         <LogOut className="w-5 h-5 group-hover:scale-110 transition-transform" />
 
                         {/* Tooltip Flotante */}
-                        <div className="absolute left-[calc(100%+14px)] top-1/2 -translate-y-1/2 px-4 py-2.5 rounded-2xl bg-black text-rose-300 font-medium text-xs shadow-2xl border border-rose-500/20 whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-200 z-50">
+                        <div className="absolute left-[calc(100%+14px)] top-1/2 -translate-y-1/2 px-4 py-2.5 rounded-2xl bg-black text-rose-300 font-medium text-xs shadow-2xl border border-rose-500/20 whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-200 z-[9999]">
                             Cerrar Sesión ({user.email})
                             <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-black border-l border-b border-rose-500/20 rotate-45"></div>
                         </div>
