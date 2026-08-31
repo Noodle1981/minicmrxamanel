@@ -68,24 +68,24 @@ export default function Show({ project, stats, technicalUsers }: ShowProps) {
     return (
         <AppLayout
             header={
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 min-w-0">
                     <Link
                         href={route('projects.index')}
-                        className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors"
+                        className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors shrink-0"
                         title="Volver a Proyectos"
                     >
                         <ArrowLeft className="w-4 h-4" />
                     </Link>
-                    <div>
-                        <div className="flex items-center gap-2">
-                            <h2 className="text-xl font-heading font-bold text-white leading-tight">
+                    <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <h2 className="text-sm sm:text-xl font-heading font-bold text-white leading-tight truncate">
                                 {project.name}
                             </h2>
-                            <span className="font-mono text-xs font-bold text-[#30EEE2]">
+                            <span className="font-mono text-xs font-bold text-[#30EEE2] shrink-0">
                                 ({project.code})
                             </span>
                         </div>
-                        <p className="text-xs text-white/50">
+                        <p className="text-xs text-white/50 hidden sm:block truncate">
                             Cliente: <strong className="text-white">{project.client?.company_name}</strong>
                         </p>
                     </div>

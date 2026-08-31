@@ -116,15 +116,15 @@ export default function Index({ quotes, sellers, filters, clients, metrics, curr
     return (
         <AppLayout
             header={
-                <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-[#30EEE2]/10 border border-[#30EEE2]/20">
+                <div className="flex items-center gap-3 min-w-0">
+                    <div className="p-2 rounded-lg bg-[#30EEE2]/10 border border-[#30EEE2]/20 shrink-0">
                         <FileText className="w-5 h-5 text-[#30EEE2]" />
                     </div>
-                    <div>
-                        <h2 className="text-xl font-heading font-bold text-white leading-tight">
+                    <div className="min-w-0">
+                        <h2 className="text-sm sm:text-xl font-heading font-bold text-white leading-tight truncate">
                             Historial de Cotizaciones & Propuestas
                         </h2>
-                        <p className="text-xs text-white/50">
+                        <p className="text-xs text-white/50 hidden sm:block truncate">
                             Seguimiento comercial y conversión a proyectos operativos
                         </p>
                     </div>

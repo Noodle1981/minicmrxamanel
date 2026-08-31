@@ -136,15 +136,15 @@ export default function Index({ users, roles, filters, metrics }: IndexProps) {
     return (
         <AppLayout
             header={
-                <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-[#30EEE2]/10 border border-[#30EEE2]/20">
+                <div className="flex items-center gap-3 min-w-0">
+                    <div className="p-2 rounded-lg bg-[#30EEE2]/10 border border-[#30EEE2]/20 shrink-0">
                         <Shield className="w-5 h-5 text-[#30EEE2]" />
                     </div>
-                    <div>
-                        <h2 className="text-xl font-heading font-bold text-white leading-tight">
+                    <div className="min-w-0">
+                        <h2 className="text-sm sm:text-xl font-heading font-bold text-white leading-tight truncate">
                             Administración de Usuarios & Roles
                         </h2>
-                        <p className="text-xs text-white/50">
+                        <p className="text-xs text-white/50 hidden sm:block truncate">
                             Control de accesos, permisos y configuración multi-rol para el equipo técnico
                         </p>
                     </div>

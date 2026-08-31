@@ -40,19 +40,19 @@ export default function Edit({ client }: EditProps) {
     return (
         <AppLayout
             header={
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 min-w-0">
                     <Link
                         href={route('clients.show', client.id)}
-                        className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors"
+                        className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors shrink-0"
                         title="Volver"
                     >
                         <ArrowLeft className="w-4 h-4" />
                     </Link>
-                    <div>
-                        <h2 className="text-xl font-heading font-bold text-white leading-tight">
+                    <div className="min-w-0">
+                        <h2 className="text-sm sm:text-xl font-heading font-bold text-white leading-tight truncate">
                             Editar Cliente: {client.company_name}
                         </h2>
-                        <p className="text-xs text-white/50">Actualización de datos corporativos</p>
+                        <p className="text-xs text-white/50 hidden sm:block truncate">Actualización de datos corporativos</p>
                     </div>
                 </div>
             }

@@ -70,27 +70,27 @@ export default function Show({ client, stats }: ShowProps) {
     return (
         <AppLayout
             header={
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 min-w-0">
                     <Link
                         href={route('clients.index')}
-                        className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors"
+                        className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors shrink-0"
                         title="Volver"
                     >
                         <ArrowLeft className="w-4 h-4" />
                     </Link>
-                    <div>
-                        <div className="flex items-center gap-2">
-                            <h2 className="text-xl font-heading font-bold text-white leading-tight">
+                    <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <h2 className="text-sm sm:text-xl font-heading font-bold text-white leading-tight truncate">
                                 {client.company_name}
                             </h2>
                             <span
-                                className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${IndustryBadge.color}`}
+                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border shrink-0 ${IndustryBadge.color}`}
                             >
                                 <IndustryIcon className="w-3 h-3" />
                                 {IndustryBadge.label}
                             </span>
                         </div>
-                        <p className="text-xs text-white/50">Ficha comercial 360°</p>
+                        <p className="text-xs text-white/50 hidden sm:block truncate">Ficha comercial 360°</p>
                     </div>
                 </div>
             }

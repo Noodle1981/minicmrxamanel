@@ -39,19 +39,19 @@ export default function Create() {
     return (
         <AppLayout
             header={
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 min-w-0">
                     <Link
                         href={route('clients.index')}
-                        className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors"
+                        className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors shrink-0"
                         title="Volver"
                     >
                         <ArrowLeft className="w-4 h-4" />
                     </Link>
-                    <div>
-                        <h2 className="text-xl font-heading font-bold text-white leading-tight">
+                    <div className="min-w-0">
+                        <h2 className="text-sm sm:text-xl font-heading font-bold text-white leading-tight truncate">
                             Registrar Nuevo Cliente
                         </h2>
-                        <p className="text-xs text-white/50">
+                        <p className="text-xs text-white/50 hidden sm:block truncate">
                             Alta de empresa en el Mini-CRM y segmentación por industria
                         </p>
                     </div>

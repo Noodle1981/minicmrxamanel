@@ -39,21 +39,21 @@ export default function Dashboard() {
     return (
         <AppLayout
             header={
-                <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-[#30EEE2]/10 border border-[#30EEE2]/20">
+                <div className="flex items-center gap-3 min-w-0">
+                    <div className="p-2 rounded-lg bg-[#30EEE2]/10 border border-[#30EEE2]/20 shrink-0">
                         {isCommercial ? (
                             <Sparkles className="w-5 h-5 text-[#30EEE2]" />
                         ) : (
                             <Laptop className="w-5 h-5 text-[#30EEE2]" />
                         )}
                     </div>
-                    <div>
-                        <h2 className="text-xl font-heading font-bold text-white leading-tight">
+                    <div className="min-w-0">
+                        <h2 className="text-sm sm:text-xl font-heading font-bold text-white leading-tight truncate">
                             {isCommercial
                                 ? 'Panel Comercial & Presupuestador — Grupo Xamanen'
                                 : 'Panel Técnico & Operativo — Grupo Xamanen'}
                         </h2>
-                        <p className="text-xs text-white/50">
+                        <p className="text-xs text-white/50 hidden sm:block truncate">
                             {isCommercial
                                 ? 'Presupuestador de Software a Medida & Gestión Comercial (Mini-CRM)'
                                 : 'Gestión de Sprints, Resolución de Tickets y Ejecución de Obras Técnicas'}
