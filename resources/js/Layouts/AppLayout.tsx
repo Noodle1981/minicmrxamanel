@@ -74,6 +74,12 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
             roles: ['super_admin', 'vendedor', 'cliente'],
         },
         {
+            name: 'Clientes (Mini-CRM)',
+            href: route('clients.index'),
+            icon: Users,
+            roles: ['super_admin', 'vendedor'],
+        },
+        {
             name: 'Proyectos & Obras',
             href: '#',
             icon: FolderKanban,
@@ -93,9 +99,9 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
         },
         {
             name: 'Portal del Cliente',
-            href: '#',
+            href: route('portal.dashboard'),
             icon: FileText,
-            roles: ['cliente'],
+            roles: ['cliente', 'super_admin', 'vendedor'],
         },
         {
             name: 'Catálogo & Matriz IA',
