@@ -69,7 +69,6 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
             routePattern: 'quotes.create',
             icon: Calculator,
             roles: ['super_admin', 'vendedor'],
-            badge: 'Aurora',
         },
         {
             name: 'Historial Cotizaciones',
