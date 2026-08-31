@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Feature;
 use App\Models\SoftwareType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -15,7 +16,7 @@ class CatalogController extends Controller
      */
     public function index(Request $request): Response
     {
-        $query = Feature::with('softwareTypes')->orderBy('category')->orderBy('name');
+        $query = Feature::with('softwareType')->orderBy('category')->orderBy('name');
 
         if ($request->filled('category')) {
             $query->where('category', $request->category);
@@ -82,13 +83,22 @@ class CatalogController extends Controller
             'is_preset_mining' => 'nullable|boolean',
             'is_preset_environment' => 'nullable|boolean',
             'is_preset_commerce' => 'nullable|boolean',
-            'software_type_ids' => 'nullable|array',
-            'software_type_ids.*' => 'exists:software_types,id',
+            'software_type_id' => 'nullable|exists:software_types,id',
         ]);
 
+        $slug = Str::slug($validated['name']);
+        $originalSlug = $slug;
+        $count = 1;
+        while (Feature::where('slug', $slug)->exists()) {
+            $slug = "{$originalSlug}-{$count}";
+            $count++;
+        }
+
         $feature = Feature::create([
+            'software_type_id' => $validated['software_type_id'] ?? null,
             'category' => $validated['category'],
             'name' => $validated['name'],
+            'slug' => $slug,
             'description' => $validated['description'] ?? null,
             'hours_dev' => $validated['hours_dev'],
             'hours_integration' => $validated['hours_integration'],
@@ -100,10 +110,6 @@ class CatalogController extends Controller
             'is_preset_commerce' => $validated['is_preset_commerce'] ?? false,
             'is_active' => true,
         ]);
-
-        if (!empty($validated['software_type_ids'])) {
-            $feature->softwareTypes()->sync($validated['software_type_ids']);
-        }
 
         return back()->with('success', "Módulo '{$feature->name}' creado exitosamente en el catálogo.");
     }
@@ -126,11 +132,11 @@ class CatalogController extends Controller
             'is_preset_environment' => 'nullable|boolean',
             'is_preset_commerce' => 'nullable|boolean',
             'is_active' => 'nullable|boolean',
-            'software_type_ids' => 'nullable|array',
-            'software_type_ids.*' => 'exists:software_types,id',
+            'software_type_id' => 'nullable|exists:software_types,id',
         ]);
 
         $feature->update([
+            'software_type_id' => $validated['software_type_id'] ?? $feature->software_type_id,
             'category' => $validated['category'],
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
@@ -144,10 +150,6 @@ class CatalogController extends Controller
             'is_preset_commerce' => $validated['is_preset_commerce'] ?? false,
             'is_active' => $validated['is_active'] ?? true,
         ]);
-
-        if (isset($validated['software_type_ids'])) {
-            $feature->softwareTypes()->sync($validated['software_type_ids']);
-        }
 
         return back()->with('success', "Módulo '{$feature->name}' actualizado.");
     }

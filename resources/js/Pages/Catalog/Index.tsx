@@ -57,6 +57,7 @@ export default function Index({ features, softwareTypes, categories, filters, me
     const [editingFeature, setEditingFeature] = useState<Feature | null>(null);
 
     const { data, setData, post, patch, processing, errors, reset } = useForm({
+        software_type_id: null as number | null,
         category: '',
         name: '',
         description: '',
@@ -69,7 +70,6 @@ export default function Index({ features, softwareTypes, categories, filters, me
         is_preset_environment: false,
         is_preset_commerce: false,
         is_active: true,
-        software_type_ids: [] as number[],
     });
 
     const handleSearch = (e: React.FormEvent) => {
@@ -85,6 +85,7 @@ export default function Index({ features, softwareTypes, categories, filters, me
         setEditingFeature(null);
         reset();
         setData({
+            software_type_id: softwareTypes[0]?.id || null,
             category: categories[0] || 'Core',
             name: '',
             description: '',
@@ -97,7 +98,6 @@ export default function Index({ features, softwareTypes, categories, filters, me
             is_preset_environment: false,
             is_preset_commerce: false,
             is_active: true,
-            software_type_ids: [],
         });
         setModalOpen(true);
     };
@@ -105,6 +105,7 @@ export default function Index({ features, softwareTypes, categories, filters, me
     const openEditModal = (feat: Feature) => {
         setEditingFeature(feat);
         setData({
+            software_type_id: feat.software_type_id || null,
             category: feat.category,
             name: feat.name,
             description: feat.description || '',
@@ -117,7 +118,6 @@ export default function Index({ features, softwareTypes, categories, filters, me
             is_preset_environment: feat.is_preset_environment,
             is_preset_commerce: feat.is_preset_commerce,
             is_active: feat.is_active,
-            software_type_ids: feat.software_type_id ? [feat.software_type_id] : [],
         });
         setModalOpen(true);
     };
@@ -132,14 +132,6 @@ export default function Index({ features, softwareTypes, categories, filters, me
             post(route('catalog.store'), {
                 onSuccess: () => setModalOpen(false),
             });
-        }
-    };
-
-    const toggleSoftwareType = (id: number) => {
-        if (data.software_type_ids.includes(id)) {
-            setData('software_type_ids', data.software_type_ids.filter((stid) => stid !== id));
-        } else {
-            setData('software_type_ids', [...data.software_type_ids, id]);
         }
     };
 
@@ -441,6 +433,41 @@ export default function Index({ features, softwareTypes, categories, filters, me
                                         className="w-full input-xamanen text-xs"
                                         required
                                     />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs font-semibold text-white/70 uppercase tracking-wider mb-1.5">
+                                        Tipo de Software Base
+                                    </label>
+                                    <select
+                                        value={data.software_type_id || ''}
+                                        onChange={(e) => setData('software_type_id', e.target.value ? Number(e.target.value) : null)}
+                                        className="w-full input-xamanen text-xs bg-[#101522]"
+                                    >
+                                        <option value="">Aplicable a Cualquier Tipo</option>
+                                        {softwareTypes.map((st) => (
+                                            <option key={st.id} value={st.id}>
+                                                {st.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-semibold text-white/70 uppercase tracking-wider mb-1.5">
+                                        Estado
+                                    </label>
+                                    <label className="flex items-center gap-2 pt-2 cursor-pointer text-xs">
+                                        <input
+                                            type="checkbox"
+                                            checked={data.is_active}
+                                            onChange={(e) => setData('is_active', e.target.checked)}
+                                            className="rounded border-white/20 text-[#30EEE2] focus:ring-[#30EEE2]"
+                                        />
+                                        <span className="text-white/80">Módulo Activo en Cotizador</span>
+                                    </label>
                                 </div>
                             </div>
 
