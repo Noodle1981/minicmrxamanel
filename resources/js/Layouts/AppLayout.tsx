@@ -186,9 +186,6 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
 
                 {/* Menú de Navegación */}
                 <nav className="flex-1 px-4 py-4 space-y-1.5 overflow-y-auto custom-scrollbar">
-                    <div className="text-[11px] font-semibold text-white/40 uppercase tracking-wider px-3 mb-2">
-                        Menú Principal
-                    </div>
                     {visibleNavItems.map((item, index) => {
                         const Icon = item.icon;
                         
