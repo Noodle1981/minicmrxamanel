@@ -145,7 +145,7 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
     };
 
     return (
-        <div className="min-h-screen bg-[#0A0C10] text-[#F0F2F5] flex flex-col md:flex-row antialiased selection:bg-[#30EEE2] selection:text-[#0A0C10]">
+        <div className="h-screen w-screen overflow-hidden bg-[#0A0C10] text-[#F0F2F5] flex flex-col md:flex-row antialiased selection:bg-[#30EEE2] selection:text-[#0A0C10]">
             {/* ==================== MOBILE SIDEBAR BACKDROP ==================== */}
             {sidebarOpen && (
                 <div
@@ -154,14 +154,14 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
                 />
             )}
 
-            {/* ==================== SIDEBAR ==================== */}
+            {/* ==================== SIDEBAR FIJO ==================== */}
             <aside
-                className={`fixed inset-y-0 left-0 z-50 w-72 bg-[#101522]/90 backdrop-blur-xl border-r border-white/10 flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:inset-auto ${
+                className={`fixed inset-y-0 left-0 z-50 w-72 bg-[#101522]/95 backdrop-blur-2xl border-r border-white/10 flex flex-col h-full shrink-0 transition-transform duration-300 ease-in-out md:static md:translate-x-0 ${
                     sidebarOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
             >
                 {/* Logo & Marca */}
-                <div className="h-20 flex items-center justify-between px-6 border-b border-white/10">
+                <div className="h-20 shrink-0 flex items-center justify-between px-6 border-b border-white/10">
                     <Link href={route('dashboard')} className="flex items-center gap-3 group">
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#30EEE2] via-[#3C84CE] to-[#65005E] p-[1.5px] shadow-lg shadow-[#30EEE2]/20">
                             <div className="w-full h-full bg-[#0A0C10] rounded-[10px] flex items-center justify-center">
@@ -247,8 +247,8 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
                     })}
                 </nav>
 
-                {/* Footer del Sidebar con Cerrar Sesión */}
-                <div className="p-4 border-t border-white/10 bg-white/[0.02]">
+                {/* Footer del Sidebar con Cerrar Sesión (Siempre Visible y Fijo) */}
+                <div className="p-4 border-t border-white/10 bg-white/[0.02] shrink-0">
                     <Link
                         href={route('logout')}
                         method="post"
@@ -273,10 +273,10 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
                 </div>
             </aside>
 
-            {/* ==================== CONTENIDO PRINCIPAL ==================== */}
-            <div className="flex-1 flex flex-col min-w-0">
-                {/* Header Superior Navbar */}
-                <header className="h-20 bg-[#101522]/80 backdrop-blur-xl border-b border-white/10 px-6 flex items-center justify-between sticky top-0 z-30">
+            {/* ==================== CONTENIDO PRINCIPAL CON SCROLL INDEPENDIENTE ==================== */}
+            <div className="flex-1 flex flex-col min-w-0 h-full overflow-y-auto custom-scrollbar">
+                {/* Header Superior Navbar (Sticky Pinned) */}
+                <header className="h-20 bg-[#101522]/90 backdrop-blur-xl border-b border-white/10 px-6 flex items-center justify-between sticky top-0 z-30 shrink-0">
                     <div className="flex items-center gap-4">
                         <button
                             onClick={() => setSidebarOpen(true)}
