@@ -144,29 +144,27 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
                     className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm md:hidden"
                     onClick={() => setSidebarOpen(false)}
                 />
-            )}
-
-            {/* ==================== SIDEBAR FIJO ==================== */}
+                  {/* ==================== SIDEBAR MINIMALISTA DE ICONOS ==================== */}
             <aside
-                className={`fixed inset-y-0 left-0 z-50 w-72 bg-[#101522]/95 backdrop-blur-2xl border-r border-white/10 flex flex-col h-full shrink-0 transition-transform duration-300 ease-in-out md:static md:translate-x-0 ${
+                className={`fixed inset-y-0 left-0 z-50 w-20 bg-[#0F1420]/95 backdrop-blur-2xl border-r border-white/10 flex flex-col items-center justify-between py-5 shrink-0 transition-transform duration-300 ease-in-out md:static md:translate-x-0 ${
                     sidebarOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
             >
-                {/* Logo & Marca */}
-                <div className="h-20 shrink-0 flex items-center justify-between px-5 border-b border-white/10">
-                    <Link href={route('dashboard')} className="flex items-center gap-3 group">
+                {/* 1. Logo Superior */}
+                <div className="flex flex-col items-center gap-3">
+                    <Link
+                        href={route('dashboard')}
+                        className="w-12 h-12 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-[#30EEE2]/40 flex items-center justify-center p-2 transition-all relative group shadow-lg"
+                    >
                         <img
                             src="/images/logo.png"
                             alt="Grupo Xamanen"
-                            className="h-10 w-auto object-contain drop-shadow-[0_0_15px_rgba(48,238,226,0.3)] group-hover:scale-105 transition-transform"
+                            className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(48,238,226,0.3)] group-hover:scale-110 transition-transform"
                         />
-                        <div>
-                            <span className="font-heading font-bold text-base text-white tracking-wide block leading-tight">
-                                Grupo <span className="text-[#30EEE2]">Xamanen</span>
-                            </span>
-                            <span className="text-[10px] text-white/50 tracking-wider uppercase block font-medium">
-                                CPQ & Operaciones
-                            </span>
+                        {/* Tooltip Flotante */}
+                        <div className="absolute left-[calc(100%+14px)] top-1/2 -translate-y-1/2 px-4 py-2 rounded-xl bg-black text-white font-semibold text-xs shadow-2xl border border-white/15 whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-200 z-50">
+                            Grupo Xamanen — Inicio
+                            <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-black border-l border-b border-white/15 rotate-45"></div>
                         </div>
                     </Link>
 
@@ -178,11 +176,11 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
                     </button>
                 </div>
 
-                {/* Menú de Navegación */}
-                <nav className="flex-1 px-4 py-4 space-y-1.5 overflow-y-auto custom-scrollbar">
+                {/* 2. Menú de Navegación por Iconos */}
+                <nav className="flex-1 flex flex-col items-center gap-3 py-6 overflow-y-auto custom-scrollbar w-full px-3">
                     {visibleNavItems.map((item, index) => {
                         const Icon = item.icon;
-                        
+
                         // Detección unívoca de ruta activa
                         let isActive = false;
                         if (item.routePattern) {
@@ -198,7 +196,7 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
                                 // fallback
                             }
                         }
-                        
+
                         if (!isActive && !item.routePattern && item.href && item.href !== '#') {
                             try {
                                 const itemPath = new URL(item.href, window.location.origin).pathname;
@@ -216,51 +214,52 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
                             <Link
                                 key={index}
                                 href={item.href}
-                                className={`relative flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                                className={`w-12 h-12 rounded-2xl flex items-center justify-center relative group transition-all duration-200 ${
                                     isActive
-                                        ? 'bg-gradient-to-r from-[#30EEE2]/20 via-[#3C84CE]/20 to-transparent text-white border border-[#30EEE2]/40 shadow-lg shadow-[#30EEE2]/10 font-bold'
-                                        : 'text-white/70 hover:text-white hover:bg-white/[0.05] border border-transparent'
+                                        ? 'bg-white/[0.15] text-[#30EEE2] border border-[#30EEE2]/50 shadow-lg shadow-[#30EEE2]/10'
+                                        : 'text-white/50 hover:text-white hover:bg-white/[0.06] border border-transparent'
                                 }`}
                             >
-                                <div className="flex items-center gap-3">
-                                    {isActive && (
-                                        <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-[#30EEE2] shadow-sm shadow-[#30EEE2]" />
-                                    )}
-                                    <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-[#30EEE2]' : 'text-white/50'}`} />
-                                    <span className={isActive ? 'text-white font-bold' : ''}>{item.name}</span>
-                                </div>
+                                <Icon className={`w-5 h-5 transition-transform duration-200 ${isActive ? 'text-[#30EEE2] scale-105' : 'group-hover:scale-110'}`} />
+
                                 {item.badge && (
-                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#30EEE2]/20 text-[#30EEE2] border border-[#30EEE2]/40">
+                                    <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#30EEE2] text-[#0A0C10] font-bold text-[9px] flex items-center justify-center shadow-md">
                                         {item.badge}
                                     </span>
                                 )}
+
+                                {/* Tooltip Flotante Negro Píldora (Estilo Imagen de Referencia) */}
+                                <div className="absolute left-[calc(100%+14px)] top-1/2 -translate-y-1/2 px-4 py-2.5 rounded-2xl bg-black text-white font-medium text-xs shadow-2xl border border-white/15 whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-200 z-50 flex items-center gap-2.5">
+                                    <span className="font-heading font-semibold tracking-wide">{item.name}</span>
+                                    {item.badge && (
+                                        <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-[#30EEE2]/20 text-[#30EEE2] border border-[#30EEE2]/40">
+                                            {item.badge}
+                                        </span>
+                                    )}
+                                    {/* Flechita orientada al icono */}
+                                    <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-black border-l border-b border-white/15 rotate-45"></div>
+                                </div>
                             </Link>
                         );
                     })}
                 </nav>
 
-                {/* Footer del Sidebar con Cerrar Sesión (Siempre Visible y Fijo) */}
-                <div className="p-4 border-t border-white/10 bg-white/[0.02] shrink-0">
+                {/* 3. Footer de Usuario y Cerrar Sesión */}
+                <div className="flex flex-col items-center gap-3 pt-4 border-t border-white/10 w-full px-3">
                     <Link
                         href={route('logout')}
                         method="post"
                         as="button"
-                        className="w-full flex items-center justify-between p-2 rounded-xl text-white/70 hover:text-rose-400 hover:bg-rose-500/10 transition-colors group"
+                        className="w-12 h-12 rounded-2xl text-white/50 hover:text-rose-400 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/30 flex items-center justify-center relative group transition-all"
                         title="Cerrar Sesión"
                     >
-                        <div className="flex items-center gap-3 overflow-hidden text-left">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#3C84CE] to-[#65005E] flex items-center justify-center text-white font-bold text-xs shrink-0 border border-white/20">
-                                {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
-                            </div>
-                            <div className="overflow-hidden">
-                                <p className="text-xs font-semibold text-white group-hover:text-rose-400 transition-colors">
-                                    Cerrar Sesión
-                                </p>
-                                <p className="text-[10px] text-white/40 truncate">{user.email}</p>
-                            </div>
-                        </div>
+                        <LogOut className="w-5 h-5 group-hover:scale-110 transition-transform" />
 
-                        <LogOut className="w-4 h-4 text-white/40 group-hover:text-rose-400 transition-colors shrink-0" />
+                        {/* Tooltip Flotante */}
+                        <div className="absolute left-[calc(100%+14px)] top-1/2 -translate-y-1/2 px-4 py-2.5 rounded-2xl bg-black text-rose-300 font-medium text-xs shadow-2xl border border-rose-500/20 whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-200 z-50">
+                            Cerrar Sesión ({user.email})
+                            <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-black border-l border-b border-rose-500/20 rotate-45"></div>
+                        </div>
                     </Link>
                 </div>
             </aside>
