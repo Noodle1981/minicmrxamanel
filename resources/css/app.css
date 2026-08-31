@@ -96,7 +96,7 @@
 }
 
 /* ==========================================================================
-   ESTILOS DE IMPRESIÓN OFICIAL / EXPORTACIÓN A PDF (A4)
+   ESTILOS DE IMPRESIÓN OFICIAL / EXPORTACIÓN A PDF (A4) - MULTIPÁGINA
    ========================================================================== */
 @media print {
     @page {
@@ -108,18 +108,23 @@
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
         box-shadow: none !important;
+        text-shadow: none !important;
     }
 
-    html, body {
-        background-color: #ffffff !important;
-        color: #0f172a !important;
-        font-size: 10pt !important;
-        line-height: 1.4 !important;
-        width: 100% !important;
+    html, body, #app, #app > div, .h-screen, .h-full, .flex-1, .overflow-hidden, .overflow-y-auto, main, .custom-scrollbar {
         height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
         overflow: visible !important;
+        position: static !important;
+        display: block !important;
+        transform: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
+        background: #ffffff !important;
+        color: #0f172a !important;
     }
 
     /* Ocultar barra lateral, barra superior y botones de control */
@@ -132,19 +137,6 @@
         display: none !important;
     }
 
-    /* Reseteo de contenedores principales para usar el 100% de la hoja A4 */
-    main,
-    .custom-scrollbar,
-    .flex-1 {
-        overflow: visible !important;
-        height: auto !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        background: transparent !important;
-        width: 100% !important;
-        max-width: 100% !important;
-    }
-
     .glass-panel {
         background: transparent !important;
         border: none !important;
@@ -153,8 +145,36 @@
         -webkit-backdrop-filter: none !important;
     }
 
+    /* Paginación de Tablas */
+    table {
+        page-break-inside: auto !important;
+        break-inside: auto !important;
+        width: 100% !important;
+        border-collapse: collapse !important;
+    }
+
+    thead {
+        display: table-header-group !important;
+    }
+
+    tr {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        page-break-after: auto !important;
+        break-after: auto !important;
+    }
+
+    tbody {
+        display: table-row-group !important;
+    }
+
     .page-break-inside-avoid {
-        break-inside: avoid;
-        page-break-inside: avoid;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+    }
+
+    .page-break-before {
+        break-before: page !important;
+        page-break-before: always !important;
     }
 }
