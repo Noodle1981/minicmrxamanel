@@ -33,6 +33,7 @@ interface AppLayoutProps {
 interface NavItem {
     name: string;
     href: string;
+    routePattern?: string;
     icon: React.ComponentType<{ className?: string }>;
     roles: RoleName[];
     badge?: string;
@@ -40,6 +41,7 @@ interface NavItem {
 
 export default function AppLayout({ header, children }: AppLayoutProps) {
     const { auth, flash } = usePage<PageProps>().props;
+    const { url } = usePage();
     const user = auth.user as User;
     const userRoles = (auth.roles || user.roles?.map((r) => r.name) || ['vendedor']) as RoleName[];
 
@@ -57,12 +59,14 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
         {
             name: 'Dashboard General',
             href: route('dashboard'),
+            routePattern: 'dashboard',
             icon: LayoutDashboard,
             roles: ['super_admin', 'vendedor', 'desarrollador', 'disenador', 'qa_tester', 'validador', 'cliente'],
         },
         {
             name: 'Cotizador CPQ',
             href: route('quotes.create'),
+            routePattern: 'quotes.create',
             icon: Calculator,
             roles: ['super_admin', 'vendedor'],
             badge: 'Aurora',
@@ -70,36 +74,42 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
         {
             name: 'Historial Cotizaciones',
             href: route('quotes.index'),
+            routePattern: 'quotes.index',
             icon: FileText,
             roles: ['super_admin', 'vendedor', 'cliente'],
         },
         {
             name: 'Clientes (Mini-CRM)',
             href: route('clients.index'),
+            routePattern: 'clients.*',
             icon: Users,
             roles: ['super_admin', 'vendedor'],
         },
         {
             name: 'Proyectos & Obras',
             href: route('projects.index'),
+            routePattern: 'projects.*',
             icon: FolderKanban,
             roles: ['super_admin', 'vendedor', 'desarrollador', 'disenador', 'qa_tester', 'validador'],
         },
         {
             name: 'Tablero de Tickets',
             href: route('tickets.index'),
+            routePattern: 'tickets.*',
             icon: CheckSquare,
             roles: ['super_admin', 'desarrollador', 'disenador', 'qa_tester', 'validador'],
         },
         {
             name: 'Calendario & Carga',
             href: route('calendar.index'),
+            routePattern: 'calendar.*',
             icon: Calendar,
             roles: ['super_admin', 'desarrollador', 'disenador', 'qa_tester', 'validador', 'vendedor'],
         },
         {
             name: 'Portal del Cliente',
             href: route('portal.dashboard'),
+            routePattern: 'portal.*',
             icon: FileText,
             roles: ['cliente', 'super_admin', 'vendedor'],
         },
@@ -233,21 +243,47 @@ export default function AppLayout({ header, children }: AppLayoutProps) {
                     </div>
                     {visibleNavItems.map((item, index) => {
                         const Icon = item.icon;
-                        const isActive = item.href !== '#' && window.location.pathname === item.href;
+                        
+                        // Detección reactiva de ruta activa
+                        let isActive = false;
+                        if (item.routePattern) {
+                            try {
+                                if (typeof route().current === 'function' && route().current(item.routePattern)) {
+                                    isActive = true;
+                                }
+                            } catch (e) {
+                                // fallback
+                            }
+                        }
+                        if (!isActive && item.href && item.href !== '#') {
+                            try {
+                                const itemPath = new URL(item.href, window.location.origin).pathname;
+                                if (itemPath === '/' && url === '/') {
+                                    isActive = true;
+                                } else if (itemPath !== '/' && url.startsWith(itemPath)) {
+                                    isActive = true;
+                                }
+                            } catch (e) {
+                                // fallback
+                            }
+                        }
 
                         return (
                             <Link
                                 key={index}
                                 href={item.href}
-                                className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                                className={`relative flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
                                     isActive
-                                        ? 'bg-gradient-to-r from-[#30EEE2]/15 to-[#3C84CE]/15 text-[#30EEE2] border border-[#30EEE2]/30 shadow-lg shadow-[#30EEE2]/10 font-semibold'
+                                        ? 'bg-gradient-to-r from-[#30EEE2]/20 via-[#3C84CE]/20 to-transparent text-white border border-[#30EEE2]/40 shadow-lg shadow-[#30EEE2]/10 font-bold'
                                         : 'text-white/70 hover:text-white hover:bg-white/[0.05] border border-transparent'
                                 }`}
                             >
                                 <div className="flex items-center gap-3">
-                                    <Icon className={`w-4 h-4 ${isActive ? 'text-[#30EEE2]' : 'text-white/50'}`} />
-                                    <span>{item.name}</span>
+                                    {isActive && (
+                                        <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-[#30EEE2] shadow-sm shadow-[#30EEE2]" />
+                                    )}
+                                    <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-[#30EEE2]' : 'text-white/50'}`} />
+                                    <span className={isActive ? 'text-white font-bold' : ''}>{item.name}</span>
                                 </div>
                                 {item.badge && (
                                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#30EEE2]/20 text-[#30EEE2] border border-[#30EEE2]/40">
