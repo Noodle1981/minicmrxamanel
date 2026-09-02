@@ -117,7 +117,7 @@ class TicketController extends Controller
             'sort_order' => $count,
         ]);
 
-        if (!empty($validated['user_id']) && !empty($validated['role_in_ticket'])) {
+        if (! empty($validated['user_id']) && ! empty($validated['role_in_ticket'])) {
             TicketAssignment::create([
                 'ticket_id' => $ticket->id,
                 'user_id' => $validated['user_id'],
@@ -146,14 +146,14 @@ class TicketController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $ticket->update(array_filter($validated, fn($v) => !is_null($v)));
+        $ticket->update(array_filter($validated, fn ($v) => ! is_null($v)));
 
         // Recalcular avance del proyecto padre
         if ($ticket->project) {
             $this->projectService->recalculateProgress($ticket->project);
         }
 
-        return back()->with('success', 'Ticket ' . $ticket->ticket_number . ' actualizado.');
+        return back()->with('success', 'Ticket '.$ticket->ticket_number.' actualizado.');
     }
 
     /**

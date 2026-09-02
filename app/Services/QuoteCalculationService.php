@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Quote;
 use Carbon\Carbon;
 
 class QuoteCalculationService
@@ -21,7 +22,7 @@ class QuoteCalculationService
         while ($addedDays < $businessDays) {
             $date->addDay();
             // 6 = Sábado, 0 / 7 = Domingo
-            if (!$date->isWeekend()) {
+            if (! $date->isWeekend()) {
                 $addedDays++;
             }
         }
@@ -52,12 +53,12 @@ class QuoteCalculationService
     public function generateQuoteNumber(): string
     {
         $year = date('Y');
-        $lastQuote = \App\Models\Quote::whereYear('created_at', $year)
+        $lastQuote = Quote::whereYear('created_at', $year)
             ->orderBy('id', 'desc')
             ->first();
 
         $nextNumber = 1;
-        if ($lastQuote && preg_match('/QUO-' . $year . '-(\d+)/', $lastQuote->quote_number, $matches)) {
+        if ($lastQuote && preg_match('/QUO-'.$year.'-(\d+)/', $lastQuote->quote_number, $matches)) {
             $nextNumber = (int) $matches[1] + 1;
         }
 

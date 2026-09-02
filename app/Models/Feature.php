@@ -28,6 +28,9 @@ class Feature extends Model
         'is_preset_industry',
         'is_preset_services',
         'is_recommended',
+        'feasibility_status',
+        'feasibility_condition',
+        'contingency_script',
         'is_active',
     ];
 

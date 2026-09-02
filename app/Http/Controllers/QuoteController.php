@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use App\Models\CommercialPack;
 use App\Models\Feature;
 use App\Models\Quote;
 use App\Models\QuoteItem;
 use App\Models\SoftwareType;
 use App\Models\User;
+use App\Services\ProjectService;
 use App\Services\QuoteCalculationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -100,13 +102,29 @@ class QuoteController extends Controller
         // Agrupar features por categoría
         $featuresByCategory = $features->groupBy('category');
 
+        $commercialPacks = CommercialPack::with(['features' => function ($q) {
+            $q->select(
+                'features.id',
+                'features.name',
+                'features.slug',
+                'features.category',
+                'features.hours_dev',
+                'features.hours_integration',
+                'features.hours_testing_qa',
+                'features.cost_setup_infra',
+                'features.cost_monthly_infra'
+            );
+        }])->where('is_active', true)->orderBy('sort_order')->get();
+
         return Inertia::render('Quotes/Create', [
             'clients' => $clients,
             'softwareTypes' => $softwareTypes,
             'features' => $features,
             'featuresByCategory' => $featuresByCategory,
+            'commercialPacks' => $commercialPacks,
             'preselectedClientId' => $request->client_id ? (int) $request->client_id : null,
             'preselectedPreset' => $request->preset ?? null,
+            'preselectedPackId' => $request->pack_id ? (int) $request->pack_id : null,
         ]);
     }
 
@@ -118,6 +136,7 @@ class QuoteController extends Controller
         $validated = $request->validate([
             'client_id' => 'required|exists:clients,id',
             'software_type_id' => 'required|exists:software_types,id',
+            'pack_id' => 'nullable|exists:commercial_packs,id',
             'title' => 'required|string|max:255',
             'preset_used' => 'nullable|string|in:mineria,medio_ambiente,comercio,industria,servicios,personalizado',
             'hourly_rate' => 'required|numeric|min:1',
@@ -168,7 +187,7 @@ class QuoteController extends Controller
             $capacityPerDay = (float) $validated['team_capacity_hours_per_day'];
             $requiredBusinessDays = $this->calculationService->calculateRequiredBusinessDays($totalHours, $capacityPerDay);
 
-            $startDate = !empty($validated['estimated_start_date'])
+            $startDate = ! empty($validated['estimated_start_date'])
                 ? Carbon::parse($validated['estimated_start_date'])
                 : Carbon::now()->addDay();
 
@@ -180,6 +199,7 @@ class QuoteController extends Controller
                 'client_id' => $validated['client_id'],
                 'software_type_id' => $validated['software_type_id'],
                 'created_by' => $request->user()->id,
+                'pack_id' => $validated['pack_id'] ?? null,
                 'title' => $validated['title'],
                 'preset_used' => $validated['preset_used'] ?? 'personalizado',
                 'status' => 'draft',
@@ -200,8 +220,8 @@ class QuoteController extends Controller
                 'estimated_start_date' => $startDate->toDateString(),
                 'estimated_delivery_date' => $deliveryDate->toDateString(),
                 'notes' => $validated['notes'] ?? null,
-                'terms_conditions' => $validated['terms_conditions'] ?? "Presupuesto válido por 15 días corridos. Incluye 3 meses de garantía técnica y soporte pos-lanzamiento.",
-                'valid_until' => !empty($validated['valid_until']) ? $validated['valid_until'] : Carbon::now()->addDays(15)->toDateString(),
+                'terms_conditions' => $validated['terms_conditions'] ?? 'Presupuesto válido por 15 días corridos. Incluye 3 meses de garantía técnica y soporte pos-lanzamiento.',
+                'valid_until' => ! empty($validated['valid_until']) ? $validated['valid_until'] : Carbon::now()->addDays(15)->toDateString(),
             ]);
 
             // 6. Crear ítems desglosados en QuoteItem
@@ -210,7 +230,7 @@ class QuoteController extends Controller
                 'quote_id' => $quote->id,
                 'feature_id' => null,
                 'category' => 'Arquitectura Base',
-                'name' => 'Estructura Base: ' . $softwareType->name,
+                'name' => 'Estructura Base: '.$softwareType->name,
                 'description' => $softwareType->description,
                 'hours_dev' => $baseDevHours,
                 'hours_integration' => $baseIntegrationHours,
@@ -243,7 +263,7 @@ class QuoteController extends Controller
             }
 
             return redirect()->route('quotes.show', $quote->id)
-                ->with('success', 'Presupuesto ' . $quote->quote_number . ' generado exitosamente.');
+                ->with('success', 'Presupuesto '.$quote->quote_number.' generado exitosamente.');
         });
     }
 
@@ -256,6 +276,7 @@ class QuoteController extends Controller
             'client',
             'softwareType',
             'creator',
+            'commercialPack',
             'items.feature',
             'project',
             'comments.user',
@@ -269,15 +290,16 @@ class QuoteController extends Controller
     /**
      * Actualizar estado comercial de la cotización con validación de titularidad
      */
-    public function updateStatus(Request $request, Quote $quote, \App\Services\ProjectService $projectService)
+    public function updateStatus(Request $request, Quote $quote, ProjectService $projectService)
     {
         $user = $request->user();
         $isCreator = (int) $user->id === (int) $quote->created_by;
         $isSuperAdmin = $user->hasRole('super_admin');
 
         // Solo el vendedor creador o un super_admin puede cambiar el estado
-        if (!$isCreator && !$isSuperAdmin) {
+        if (! $isCreator && ! $isSuperAdmin) {
             $creatorName = $quote->creator->name ?? 'otro vendedor';
+
             return back()->with('error', "Acceso restringido: Este presupuesto pertenece al vendedor titular {$creatorName}. Solo él o un Super Administrador tienen autorización para modificar su estado.");
         }
 
@@ -295,7 +317,7 @@ class QuoteController extends Controller
             // Generación automática de Proyecto y Tickets
             $project = $projectService->createProjectFromQuote($quote, $request->user());
 
-            return back()->with('success', '¡Presupuesto aceptado! Se ha generado automáticamente el proyecto ' . $project->code . ' con sus tickets de trabajo.');
+            return back()->with('success', '¡Presupuesto aceptado! Se ha generado automáticamente el proyecto '.$project->code.' con sus tickets de trabajo.');
         } elseif ($validated['status'] === 'rejected') {
             $updateData['rejected_at'] = Carbon::now();
             $updateData['rejection_reason'] = $validated['rejection_reason'] ?? null;
@@ -304,6 +326,6 @@ class QuoteController extends Controller
             $quote->update($updateData);
         }
 
-        return back()->with('success', 'Estado del presupuesto actualizado a: ' . strtoupper($validated['status']));
+        return back()->with('success', 'Estado del presupuesto actualizado a: '.strtoupper($validated['status']));
     }
 }

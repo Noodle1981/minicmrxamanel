@@ -20,6 +20,10 @@ import {
     DollarSign,
     Sparkles,
     Shield,
+    Download,
+    FileSpreadsheet,
+    FileCode,
+    Check,
 } from 'lucide-react';
 
 interface PaginatedFeatures {
@@ -85,6 +89,34 @@ export default function Index({ features, softwareTypes, categories, filters, me
             { search, category: categoryFilter, preset: presetFilter },
             { preserveState: true }
         );
+    };
+
+    const [copiedPrompt, setCopiedPrompt] = useState(false);
+    const [exportingPrompt, setExportingPrompt] = useState(false);
+
+    const getExportUrl = (format: 'csv' | 'json' | 'prompt') => {
+        const params: Record<string, string> = { format };
+        if (categoryFilter) params.category = categoryFilter;
+        if (presetFilter) params.preset = presetFilter;
+        if (search) params.search = search;
+        return route('catalog.export', params);
+    };
+
+    const handleCopyPrompt = async () => {
+        setExportingPrompt(true);
+        try {
+            const url = getExportUrl('prompt');
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('Error al obtener prompt');
+            const text = await res.text();
+            await navigator.clipboard.writeText(text);
+            setCopiedPrompt(true);
+            setTimeout(() => setCopiedPrompt(false), 3000);
+        } catch (err) {
+            console.error('Error al copiar prompt para IA:', err);
+        } finally {
+            setExportingPrompt(false);
+        }
     };
 
     const openCreateModal = () => {
@@ -167,7 +199,7 @@ export default function Index({ features, softwareTypes, categories, filters, me
             <Head title="Catálogo & Matriz IA" />
 
             {/* Barra de Acciones del Cuerpo */}
-            <div className="flex items-center justify-between gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <div>
                     <h3 className="text-sm font-heading font-bold text-white">Módulos de Software</h3>
                     <p className="text-xs text-white/50">
@@ -175,14 +207,54 @@ export default function Index({ features, softwareTypes, categories, filters, me
                     </p>
                 </div>
 
-                <button
-                    type="button"
-                    onClick={openCreateModal}
-                    className="btn-xamanen-primary text-xs shrink-0 shadow-lg"
-                >
-                    <Plus className="w-4 h-4" />
-                    Nuevo Módulo
-                </button>
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                    <a
+                        href={getExportUrl('csv')}
+                        className="btn-xamanen-secondary text-xs flex items-center gap-1.5 px-3 py-2"
+                        title="Descargar módulos filtrados en formato CSV para Excel o Google Sheets"
+                    >
+                        <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Exportar CSV</span>
+                    </a>
+
+                    <a
+                        href={getExportUrl('json')}
+                        className="btn-xamanen-secondary text-xs flex items-center gap-1.5 px-3 py-2"
+                        title="Descargar datos filtrados en formato JSON para APIs o LLMs"
+                    >
+                        <FileCode className="w-3.5 h-3.5 text-blue-400" />
+                        <span>JSON</span>
+                    </a>
+
+                    <button
+                        type="button"
+                        onClick={handleCopyPrompt}
+                        disabled={exportingPrompt}
+                        className="btn-xamanen-secondary text-xs flex items-center gap-1.5 px-3 py-2 border-purple-500/30 hover:border-purple-500/60 text-purple-300 hover:text-white transition-colors"
+                        title="Copiar prompt completo con los módulos filtrados listo para pegar en ChatGPT o Claude"
+                    >
+                        {copiedPrompt ? (
+                            <>
+                                <Check className="w-3.5 h-3.5 text-emerald-400" />
+                                <span className="text-emerald-400 font-semibold">¡Prompt Copiado!</span>
+                            </>
+                        ) : (
+                            <>
+                                <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                                <span>{exportingPrompt ? 'Copiando...' : 'Copiar Prompt IA'}</span>
+                            </>
+                        )}
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={openCreateModal}
+                        className="btn-xamanen-primary text-xs shrink-0 shadow-lg"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Nuevo Módulo
+                    </button>
+                </div>
             </div>
 
             {/* KPIs de la Matriz de Esfuerzo */}
@@ -308,6 +380,48 @@ export default function Index({ features, softwareTypes, categories, filters, me
                         </button>
                     </div>
                 </form>
+
+                {/* Resumen de filtro y accesos directos de descarga */}
+                <div className="mt-3 pt-3 border-t border-white/10 flex flex-wrap items-center justify-between text-xs text-white/60 gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-[#30EEE2]/10 text-[#30EEE2] border border-[#30EEE2]/20">
+                            {features.total} módulos encontrados
+                        </span>
+                        {(categoryFilter || presetFilter || search) && (
+                            <span className="text-white/40 text-[11px]">
+                                (Filtro:{presetFilter ? ` Preset: ${presetFilter}` : ''}{categoryFilter ? ` · Categoría: ${categoryFilter}` : ''}{search ? ` · Búsqueda: "${search}"` : ''})
+                            </span>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-3 text-[11px]">
+                        <span className="text-white/40">Descargar todo lo filtrado:</span>
+                        <a
+                            href={getExportUrl('csv')}
+                            className="text-[#30EEE2] hover:text-[#30EEE2]/80 font-medium inline-flex items-center gap-1 transition-colors"
+                            title="Descargar todos los módulos que coinciden con el filtro en CSV"
+                        >
+                            <Download className="w-3 h-3" /> CSV
+                        </a>
+                        <span className="text-white/20">·</span>
+                        <a
+                            href={getExportUrl('json')}
+                            className="text-blue-400 hover:text-blue-300 font-medium inline-flex items-center gap-1 transition-colors"
+                            title="Descargar todos los módulos que coinciden con el filtro en JSON"
+                        >
+                            <Download className="w-3 h-3" /> JSON
+                        </a>
+                        <span className="text-white/20">·</span>
+                        <button
+                            type="button"
+                            onClick={handleCopyPrompt}
+                            disabled={exportingPrompt}
+                            className="text-purple-300 hover:text-purple-200 font-medium inline-flex items-center gap-1 transition-colors"
+                            title="Copiar prompt completo para calibrar horas en ChatGPT o Claude"
+                        >
+                            <Sparkles className="w-3 h-3" /> Prompt IA
+                        </button>
+                    </div>
+                </div>
             </div>
 
             {/* Tabla de Módulos y Matriz IA */}
@@ -332,13 +446,40 @@ export default function Index({ features, softwareTypes, categories, filters, me
                                 return (
                                     <tr key={feat.id} className="hover:bg-white/[0.03] transition-colors">
                                         <td className="py-4 px-4 align-top">
-                                            <div className="font-heading font-bold text-white text-[13px] tracking-tight">
-                                                {feat.name}
+                                            <div className="flex flex-wrap items-center gap-2 mb-1">
+                                                <span className="font-heading font-bold text-white text-[13px] tracking-tight">
+                                                    {feat.name}
+                                                </span>
+                                                {feat.feasibility_status === 'rojo' && (
+                                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                                                        🔴 Zona Roja (No Viable)
+                                                    </span>
+                                                )}
+                                                {feat.feasibility_status === 'amarillo' && (
+                                                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                                        🟡 Zona Amarilla (Condicionado)
+                                                    </span>
+                                                )}
+                                                {(!feat.feasibility_status || feat.feasibility_status === 'verde') && (
+                                                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/25">
+                                                        🟢 Viable
+                                                    </span>
+                                                )}
                                             </div>
                                             {feat.description && (
-                                                <p className="text-[11px] text-white/55 mt-1 leading-relaxed max-w-xl">
+                                                <p className="text-[11px] text-white/55 leading-relaxed max-w-xl">
                                                     {feat.description}
                                                 </p>
+                                            )}
+                                            {feat.feasibility_condition && feat.feasibility_status === 'amarillo' && (
+                                                <div className="mt-1.5 text-[10px] text-amber-300/90 bg-amber-500/10 border border-amber-500/20 px-2 py-1 rounded max-w-xl">
+                                                    ⚠️ <strong>Condición:</strong> {feat.feasibility_condition}
+                                                </div>
+                                            )}
+                                            {feat.contingency_script && feat.feasibility_status === 'rojo' && (
+                                                <div className="mt-1.5 text-[10px] text-rose-200/90 bg-rose-950/40 border border-rose-500/30 px-2 py-1 rounded max-w-xl italic">
+                                                    🚫 <strong>Respuesta sugerida si el cliente lo pide:</strong> "{feat.contingency_script}"
+                                                </div>
                                             )}
                                         </td>
 

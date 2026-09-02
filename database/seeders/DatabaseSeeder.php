@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             SoftwareTypeSeeder::class,
             FeatureSeeder::class,
+            CommercialPackSeeder::class,
             ClientSeeder::class,
         ]);
     }

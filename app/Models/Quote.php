@@ -18,6 +18,7 @@ class Quote extends Model
         'client_id',
         'software_type_id',
         'created_by',
+        'pack_id',
         'title',
         'preset_used',
         'status',
@@ -82,6 +83,11 @@ class Quote extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function commercialPack(): BelongsTo
+    {
+        return $this->belongsTo(CommercialPack::class, 'pack_id');
     }
 
     public function items(): HasMany

@@ -15,6 +15,7 @@ Route::get('/', function () {
     if (auth()->check()) {
         return redirect()->route('dashboard');
     }
+
     return redirect()->route('login');
 });
 
@@ -48,6 +49,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Módulo Catálogo & Matriz de Horas IA
     Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
+    Route::get('/catalog/export', [CatalogController::class, 'export'])->name('catalog.export');
     Route::post('/catalog', [CatalogController::class, 'store'])->name('catalog.store');
     Route::patch('/catalog/{feature}', [CatalogController::class, 'update'])->name('catalog.update');
 

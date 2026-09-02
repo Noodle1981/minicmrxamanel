@@ -55,7 +55,7 @@ class CalendarController extends Controller
             $projectsQuery->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('code', 'like', "%{$search}%")
-                    ->orWhereHas('client', fn($cq) => $cq->where('company_name', 'like', "%{$search}%"));
+                    ->orWhereHas('client', fn ($cq) => $cq->where('company_name', 'like', "%{$search}%"));
             });
         }
 
@@ -64,7 +64,7 @@ class CalendarController extends Controller
             $sellerId = $request->seller_id;
             $projectsQuery->where(function ($q) use ($sellerId) {
                 $q->where('manager_id', $sellerId)
-                    ->orWhereHas('quote', fn($qq) => $qq->where('created_by', $sellerId));
+                    ->orWhereHas('quote', fn ($qq) => $qq->where('created_by', $sellerId));
             });
         }
 
@@ -153,14 +153,14 @@ class CalendarController extends Controller
             $dailyHours = 0.0;
             $dayProjects = [];
 
-            if (!$isWeekend) {
+            if (! $isWeekend) {
                 foreach ($projects as $prj) {
                     $pStart = Carbon::parse($prj->start_date);
                     $pDue = Carbon::parse($prj->due_date);
 
                     if ($currentDate->between($pStart, $pDue)) {
                         $totalPrjHours = (float) $prj->tickets->sum('estimated_hours');
-                        $prjDays = max(1, $pStart->diffInDaysFiltered(fn(Carbon $d) => !$d->isWeekend(), $pDue));
+                        $prjDays = max(1, $pStart->diffInDaysFiltered(fn (Carbon $d) => ! $d->isWeekend(), $pDue));
                         $hoursForDay = round($totalPrjHours / $prjDays, 1);
                         $dailyHours += $hoursForDay;
 
@@ -179,7 +179,7 @@ class CalendarController extends Controller
 
             // Nivel de carga
             $loadLevel = 'none';
-            if (!$isWeekend) {
+            if (! $isWeekend) {
                 if ($dailyHours === 0.0) {
                     $loadLevel = 'free';
                 } elseif ($dailyHours < 6.0) {
@@ -236,7 +236,7 @@ class CalendarController extends Controller
             $q->whereIn('name', ['vendedor', 'super_admin']);
         })->select('id', 'name', 'email')->orderBy('name')->get();
 
-        $monthNameEs = $monthNamesEs[$monthNum] . ' ' . $year;
+        $monthNameEs = $monthNamesEs[$monthNum].' '.$year;
 
         $currentMonthDays = collect($daysInMonth)->where('is_current_month', true);
 

@@ -40,9 +40,9 @@ class AdminController extends Controller
         $metrics = [
             'total_users' => User::count(),
             'active_users' => User::where('is_active', true)->count(),
-            'admins_count' => User::whereHas('roles', fn($q) => $q->where('name', 'super_admin'))->count(),
-            'sales_count' => User::whereHas('roles', fn($q) => $q->where('name', 'vendedor'))->count(),
-            'devs_count' => User::whereHas('roles', fn($q) => $q->whereIn('name', ['desarrollador', 'disenador', 'qa_tester', 'validador']))->count(),
+            'admins_count' => User::whereHas('roles', fn ($q) => $q->where('name', 'super_admin'))->count(),
+            'sales_count' => User::whereHas('roles', fn ($q) => $q->where('name', 'vendedor'))->count(),
+            'devs_count' => User::whereHas('roles', fn ($q) => $q->whereIn('name', ['desarrollador', 'disenador', 'qa_tester', 'validador']))->count(),
         ];
 
         return Inertia::render('Admin/Users/Index', [
@@ -88,7 +88,7 @@ class AdminController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'email' => 'required|email|max:255|unique:users,email,'.$user->id,
             'phone' => 'nullable|string|max:50',
             'password' => 'nullable|string|min:8',
             'is_active' => 'nullable|boolean',
@@ -103,7 +103,7 @@ class AdminController extends Controller
             'is_active' => $validated['is_active'] ?? true,
         ];
 
-        if (!empty($validated['password'])) {
+        if (! empty($validated['password'])) {
             $updateData['password'] = Hash::make($validated['password']);
         }
 
@@ -119,10 +119,11 @@ class AdminController extends Controller
     public function toggleStatus(User $user)
     {
         $user->update([
-            'is_active' => !$user->is_active,
+            'is_active' => ! $user->is_active,
         ]);
 
         $statusMsg = $user->is_active ? 'activado' : 'desactivado';
+
         return back()->with('success', "Usuario '{$user->name}' {$statusMsg}.");
     }
 }

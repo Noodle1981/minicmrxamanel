@@ -29,7 +29,7 @@ class ProjectService
             $year = date('Y');
             $lastProject = Project::whereYear('created_at', $year)->orderBy('id', 'desc')->first();
             $nextNum = 1;
-            if ($lastProject && preg_match('/PRJ-' . $year . '-(\d+)/', $lastProject->code, $m)) {
+            if ($lastProject && preg_match('/PRJ-'.$year.'-(\d+)/', $lastProject->code, $m)) {
                 $nextNum = (int) $m[1] + 1;
             }
             $projectCode = sprintf('PRJ-%s-%04d', $year, $nextNum);

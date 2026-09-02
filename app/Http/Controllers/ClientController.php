@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
-use App\Models\Quote;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -86,11 +85,11 @@ class ClientController extends Controller
         // Si se solicitó redirigir directamente al cotizador
         if ($request->boolean('redirect_to_quote')) {
             return redirect()->route('quotes.create', ['client_id' => $client->id])
-                ->with('success', 'Cliente ' . $client->company_name . ' registrado. Iniciando cotización...');
+                ->with('success', 'Cliente '.$client->company_name.' registrado. Iniciando cotización...');
         }
 
         return redirect()->route('clients.show', $client->id)
-            ->with('success', 'Cliente ' . $client->company_name . ' registrado exitosamente.');
+            ->with('success', 'Cliente '.$client->company_name.' registrado exitosamente.');
     }
 
     /**
@@ -145,7 +144,7 @@ class ClientController extends Controller
         $validated = $request->validate([
             'company_name' => 'required|string|max:255',
             'contact_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:clients,email,' . $client->id,
+            'email' => 'required|email|max:255|unique:clients,email,'.$client->id,
             'phone' => 'nullable|string|max:50',
             'industry' => 'required|string|in:mineria,medio_ambiente,comercio,servicios,otro',
             'cuit_tax_id' => 'nullable|string|max:50',
@@ -168,6 +167,6 @@ class ClientController extends Controller
         $client->delete();
 
         return redirect()->route('clients.index')
-            ->with('success', 'Cliente ' . $company . ' eliminado de la cartera.');
+            ->with('success', 'Cliente '.$company.' eliminado de la cartera.');
     }
 }

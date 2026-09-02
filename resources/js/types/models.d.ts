@@ -133,6 +133,9 @@ export interface Feature {
     is_preset_industry: boolean;
     is_preset_services: boolean;
     is_recommended: boolean;
+    feasibility_status?: 'verde' | 'amarillo' | 'rojo' | string;
+    feasibility_condition?: string | null;
+    contingency_script?: string | null;
     is_active: boolean;
     software_type?: SoftwareType | null;
     created_at: string;
@@ -158,14 +161,32 @@ export interface QuoteItem {
     updated_at: string;
 }
 
+export interface CommercialPack {
+    id: number;
+    name: string;
+    slug: string;
+    description?: string | null;
+    target_audience?: string | null;
+    total_hours: number;
+    price_min_usd: number;
+    price_max_usd: number;
+    monthly_maintenance_usd: number;
+    is_active: boolean;
+    sort_order: number;
+    features?: (Feature & { pivot?: { is_mandatory: boolean } })[];
+    created_at?: string;
+    updated_at?: string;
+}
+
 export interface Quote {
     id: number;
     quote_number: string;
     client_id: number;
     software_type_id: number;
     created_by: number;
+    pack_id?: number | null;
     title: string;
-    preset_used?: 'mineria' | 'medio_ambiente' | 'comercio' | 'personalizado' | null;
+    preset_used?: 'mineria' | 'medio_ambiente' | 'comercio' | 'industria' | 'servicios' | 'personalizado' | string | null;
     status: QuoteStatus;
     currency: string;
     hourly_rate: number;
@@ -192,6 +213,7 @@ export interface Quote {
     client?: Client;
     software_type?: SoftwareType;
     creator?: User;
+    commercial_pack?: CommercialPack | null;
     items?: QuoteItem[];
     project?: Project | null;
     comments?: Comment[];

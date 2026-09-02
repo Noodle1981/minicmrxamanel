@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Feature;
-use App\Models\SoftwareType;
 use Illuminate\Database\Seeder;
 
 class FeatureSeeder extends Seeder
@@ -61,12 +60,12 @@ class FeatureSeeder extends Seeder
                 'hours_testing_qa' => 16.00,
                 'cost_setup_infra' => 80.00,
                 'cost_monthly_infra' => 60.00,
-                'is_preset_mining' => true,
+                'is_preset_mining' => false,
                 'is_preset_environment' => false,
                 'is_preset_commerce' => false,
                 'is_preset_industry' => false,
                 'is_preset_services' => false,
-                'is_recommended' => true,
+                'is_recommended' => false,
             ],
             [
                 'category' => 'Minería & HSE',
@@ -78,7 +77,7 @@ class FeatureSeeder extends Seeder
                 'hours_testing_qa' => 12.00,
                 'cost_setup_infra' => 50.00,
                 'cost_monthly_infra' => 45.00,
-                'is_preset_mining' => true,
+                'is_preset_mining' => false,
                 'is_preset_environment' => false,
                 'is_preset_commerce' => false,
                 'is_preset_industry' => false,
@@ -95,12 +94,12 @@ class FeatureSeeder extends Seeder
                 'hours_testing_qa' => 20.00,
                 'cost_setup_infra' => 30.00,
                 'cost_monthly_infra' => 20.00,
-                'is_preset_mining' => true,
-                'is_preset_environment' => true,
+                'is_preset_mining' => false,
+                'is_preset_environment' => false,
                 'is_preset_commerce' => false,
-                'is_preset_industry' => true,
+                'is_preset_industry' => false,
                 'is_preset_services' => false,
-                'is_recommended' => true,
+                'is_recommended' => false,
             ],
             [
                 'category' => 'Minería & HSE',
@@ -206,7 +205,7 @@ class FeatureSeeder extends Seeder
                 'is_preset_commerce' => true,
                 'is_preset_industry' => false,
                 'is_preset_services' => true,
-                'is_recommended' => true,
+                'is_recommended' => false,
             ],
             [
                 'category' => 'Comercio & Pagos',
@@ -223,7 +222,7 @@ class FeatureSeeder extends Seeder
                 'is_preset_commerce' => true,
                 'is_preset_industry' => true,
                 'is_preset_services' => true,
-                'is_recommended' => true,
+                'is_recommended' => false,
             ],
             [
                 'category' => 'Comercio & Pagos',
@@ -237,7 +236,7 @@ class FeatureSeeder extends Seeder
                 'cost_monthly_infra' => 20.00,
                 'is_preset_mining' => false,
                 'is_preset_environment' => false,
-                'is_preset_commerce' => true,
+                'is_preset_commerce' => false,
                 'is_preset_industry' => false,
                 'is_preset_services' => false,
                 'is_recommended' => false,
@@ -259,7 +258,7 @@ class FeatureSeeder extends Seeder
                 'is_preset_commerce' => false,
                 'is_preset_industry' => true,
                 'is_preset_services' => false,
-                'is_recommended' => true,
+                'is_recommended' => false,
             ],
             [
                 'category' => 'Industria & Manufactura',
@@ -325,7 +324,7 @@ class FeatureSeeder extends Seeder
                 'is_preset_mining' => false,
                 'is_preset_environment' => false,
                 'is_preset_commerce' => false,
-                'is_preset_industry' => true,
+                'is_preset_industry' => false,
                 'is_preset_services' => false,
                 'is_recommended' => false,
             ],
@@ -380,7 +379,7 @@ class FeatureSeeder extends Seeder
                 'is_preset_commerce' => false,
                 'is_preset_industry' => false,
                 'is_preset_services' => true,
-                'is_recommended' => true,
+                'is_recommended' => false,
             ],
             [
                 'category' => 'Servicios & Consultoría',
@@ -430,9 +429,9 @@ class FeatureSeeder extends Seeder
                 'cost_monthly_infra' => 45.00,
                 'is_preset_mining' => false,
                 'is_preset_environment' => false,
-                'is_preset_commerce' => true,
+                'is_preset_commerce' => false,
                 'is_preset_industry' => false,
-                'is_preset_services' => true,
+                'is_preset_services' => false,
                 'is_recommended' => false,
             ],
             [
@@ -492,8 +491,63 @@ class FeatureSeeder extends Seeder
             ],
         ];
 
+        $feasibilityMap = [
+            // ZONA AMARILLA
+            'payment-gateway-integration' => [
+                'status' => 'amarillo',
+                'condition' => 'Requiere cuenta bancaria o de Mercado Pago / Stripe validada y con credenciales de producción provistas por el cliente.',
+            ],
+            'afip-invoicing-integration' => [
+                'status' => 'amarillo',
+                'condition' => 'El cliente debe proveer CUIT, clave fiscal y delegar certificados fiscales (CSR/alias fiscal en AFIP) a tiempo.',
+            ],
+            'production-orders-traceability' => [
+                'status' => 'amarillo',
+                'condition' => 'Exige mapeo previo de los estados de fabricación y flujos operativos de planta antes de iniciar el desarrollo.',
+            ],
+            'service-contracts-recurring-billing' => [
+                'status' => 'amarillo',
+                'condition' => 'Exige definición clara de días de corte, políticas de recargo por mora y ciclos de facturación acordados.',
+            ],
+            'appointment-booking-calendar' => [
+                'status' => 'amarillo',
+                'condition' => 'Solo turnos en plataforma interna con exportación de archivos .ics; no incluye sincronización bidireccional compleja con APIs de calendarios externos.',
+            ],
+
+            // ZONA ROJA
+            'iot-sensors-mining' => [
+                'status' => 'rojo',
+                'script' => 'Nosotros implementamos el sistema de gestión operativa (CMMS y Calidad). Los operarios registran paradas y métricas desde tablets en planta en 5 segundos. No realizamos cableado ni conexiones eléctricas a PLC para no alterar las garantías de sus maquinarias.',
+            ],
+            'gis-geofencing-mining' => [
+                'status' => 'rojo',
+                'script' => 'El cálculo cartográfico satelital en tiempo real presenta desvíos por cobertura GPS de faena y costos elevados por peticiones de APIs. Proveemos geolocalización por puntos de control fijos y registro de coordenadas al inicio/fin de turnos.',
+            ],
+            'offline-sync-mobile' => [
+                'status' => 'rojo',
+                'script' => 'Nuestra plataforma está optimizada para cargar de forma ultra liviana con conexión móvil 3G/4G. Para zonas sin señal, implementamos un esquema ágil donde el técnico completa la planilla base y la sube en un clic al retornar al campamento o zona Wi-Fi, asegurando que ningún dato se sobreescriba ni se pierda.',
+            ],
+            'logistics-shipping-api' => [
+                'status' => 'rojo',
+                'script' => 'Para evitar que una caída del servidor del correo te deje sin ventas en el checkout, configuramos un cotizador por zonas y código postal con tarifas preestablecidas o retiro en sucursal. Es mucho más rápido y no frustra al comprador.',
+            ],
+            'ai-chatbot-whatsapp' => [
+                'status' => 'rojo',
+                'script' => 'Para proteger tu línea comercial contra bloqueos de Meta y evitar costos sorpresa por mensaje, integramos un botón directo a WhatsApp con mensaje predeterminado y un motor de notificaciones automáticas por Email y Web Push para que no pierdas ninguna consulta.',
+            ],
+            'iot-oee-factory-sensors' => [
+                'status' => 'rojo',
+                'script' => 'Nosotros implementamos el sistema de gestión operativa (CMMS y Calidad). Los operarios registran paradas y métricas desde tablets en planta en 5 segundos. No realizamos cableado ni conexiones eléctricas a PLC para no alterar las garantías de sus maquinarias.',
+            ],
+        ];
+
         foreach ($features as $featureData) {
-            Feature::updateOrCreate(['slug' => $featureData['slug']], $featureData);
+            $slug = $featureData['slug'];
+            $featureData['feasibility_status'] = $feasibilityMap[$slug]['status'] ?? 'verde';
+            $featureData['feasibility_condition'] = $feasibilityMap[$slug]['condition'] ?? null;
+            $featureData['contingency_script'] = $feasibilityMap[$slug]['script'] ?? null;
+
+            Feature::updateOrCreate(['slug' => $slug], $featureData);
         }
     }
 }

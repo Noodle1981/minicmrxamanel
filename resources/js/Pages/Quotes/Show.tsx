@@ -23,6 +23,7 @@ import {
     AlertCircle,
     Lock,
     UserCheck,
+    Package,
 } from 'lucide-react';
 
 interface ShowProps {
@@ -251,6 +252,12 @@ export default function Show({ quote }: ShowProps) {
                                 {quote.title}
                             </h4>
                             <div className="space-y-1 text-xs text-white/70">
+                                {quote.commercial_pack && (
+                                    <p className="flex items-center gap-1.5 text-xs text-[#30EEE2] font-semibold mb-1">
+                                        <Package className="w-3.5 h-3.5" />
+                                        <span>Pack Comercial: {quote.commercial_pack.name}</span>
+                                    </p>
+                                )}
                                 <p>
                                     <strong>Tipo de Solución:</strong> {quote.software_type?.name}
                                 </p>
